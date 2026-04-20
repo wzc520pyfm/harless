@@ -77,7 +77,7 @@ The goal is not to replace heavy alternatives (Superpowers, OpenSpec, claude-mem
                            ▼
 ┌─────────────────────────────────────────────────────────────┐
 │  Tool Layer (npm package)                                    │
-│  harless CLI — < 500 LOC Node                                │
+│  harless CLI — ≤ 500 LOC Node                                │
 │   init / add / remove / update / doctor                      │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -98,6 +98,11 @@ The goal is not to replace heavy alternatives (Superpowers, OpenSpec, claude-mem
 | `harless update` | Hash-based update with `[k]eep / [o]verwrite` per file | ✅ |
 | `harless doctor` | Inspect environment, agent config, MCP, permissions | ✅ (read-only) |
 
+**Global flags (apply to all commands):**
+
+- `--yes` — non-interactive; semantics per §4.3.
+- `--offline` — skip the optional npm-registry version check and any other network probe (e.g., MCP package metadata lookup). Useful in air-gapped CI. Has no effect on file operations.
+
 **Not in v0.1:** `login`, `publish`, `share`, `ai`, `run`, `watch`, `spec new`, `memory query`. The CLI is **not** a second agent UI — agents call scripts and read files directly.
 
 ### 4.2 Exit-Code Convention (consolidated)
@@ -117,7 +122,7 @@ The goal is not to replace heavy alternatives (Superpowers, OpenSpec, claude-mem
 | `init` | use defaults; on AGENTS.md/MCP merge conflict → exit 2 | interactive prompts |
 | `add <m>` | overwrite-if-pristine, exit 2 if user-modified | prompt `[k]eep / [o]verwrite` |
 | `update` | overwrite-if-pristine, exit 2 if conflict | prompt `[k]eep / [o]verwrite` |
-| `remove <m>` | move user-modified files to `.harness/.trash/<ts>/` then delete pristine ones | confirm + warn before any deletion |
+| `remove <m>` | delete pristine files; move user-modified files to `.harness/.trash/<ts>/` (per §4.6) | per-file `[d]elete / [t]rash / [k]eep` prompt (§4.6) |
 | `doctor` | n/a (read-only) | n/a |
 
 ### 4.4 `init` Behavior
@@ -298,8 +303,8 @@ demand before acting.
 
 ```yaml
 ---
-name: ralph-loop
-description: Use when you need an iterative self-correcting loop ...
+name: loop
+description: Use when you need an iterative self-correcting loop that keeps running an agent against a goal until a done condition is met. Involves writing a goal.md and check.sh, then calling .harness/scripts/loop.sh.
 when-to-use:
   - Long-running refactors with a clear done criterion
   - Fixing flaky tests by repeated targeted runs
@@ -339,7 +344,7 @@ requires-scripts:
 
 ## 6. Eight Modules
 
-Each module is **1 SKILL.md + (optional) 1 script**, ≤ 120 LOC markdown and ≤ 80 LOC script.
+Each module is **1 SKILL.md + (optional) 1 script**, ≤ 100 LOC markdown and ≤ 80 LOC script (per §5.2 budget table). The `skills` module is a 5-file bundle; all other modules ship a single SKILL.md.
 
 ### 6.1 `skills` — discipline bundle (Superpowers minimal subset)
 
@@ -440,8 +445,11 @@ node -e '
 done
 wait
 echo
+# Final summary table schema (always emitted):
+#   id <TAB> exit <TAB> log
+# Sorted by exit code descending (failures first); exit code of dispatch.sh
+# itself is 0 if all tasks exit 0, else 1.
 printf "%-20s %-6s %s\n" "id" "exit" "log"
-# (post-loop: parse exit codes; omitted here for brevity, lives in real script)
 ```
 
 v0.1: parallel-only, no DAG. DAGs decompose into multiple sequential dispatches. Default-off in `init`.
@@ -525,7 +533,7 @@ The following claims must be empirically validated **before CLI implementation b
 | V4 | `cursor-agent -p "<prompt>"` exists as a non-interactive invocation in 2026 | Run `cursor-agent --help` and `cursor-agent -p "echo hi"` | If false: discover the actual flag (likely `--print` or `--prompt`); update `$AGENT_CMD` examples |
 | V5 | `copilot -p "<prompt>"` exists for Copilot CLI's coding agent | Run `copilot --help` | If false: tier-2 agent removed from default examples; Tier 2 status retained only if any non-interactive mode exists |
 | V6 | `chrome-devtools-mcp` package name and config schema are stable in 2026 | `npm view chrome-devtools-mcp` and current README check | If renamed/forked: update `init`'s injected MCP block |
-| V7 | Project-root `AGENTS.md` is read by CC, Cursor, and Codex CLI as primary convention (vs. `CLAUDE.md`, `.cursorrules`) | Each agent's docs check + a "hello, can you see AGENTS.md?" probe | If any agent prefers a different file: §13.2 coexistence rules apply (we still write only AGENTS.md and let the agent's compatibility shim cover it) |
+| V7 | Project-root `AGENTS.md` is read by CC, Cursor, and Codex CLI as primary convention (vs. `CLAUDE.md`, `.cursorrules`) | Each agent's docs check + a "hello, can you see AGENTS.md?" probe | If an agent prefers a different file: `init` writes a 1-line **shim** in that agent's preferred file (e.g., `CLAUDE.md` containing only `Read AGENTS.md and follow it.`); shim is hash-tracked like other generated files. Tier downgrade considered if shim still fails to route. |
 
 A short script `scripts/verify.sh` SHOULD be authored as the first implementation task, automating V4–V6 and providing manual-step instructions for V1–V3, V7. Verification results land in `docs/smoke/verification.md` and are cited in the v0.1.0 release notes.
 
@@ -538,11 +546,11 @@ A short script `scripts/verify.sh` SHOULD be authored as the first implementatio
 | Time | Event | Agent action |
 |---|---|---|
 | T+00:00 | `npx harless init` | — |
-| T+00:05 | "Add a favorites feature" | reads `brainstorming/SKILL.md` → produces `specs/2026-04-20-favorites/{spec,plan,tasks}.md` |
-| T+00:30 | implementation | reads `spec-driven/SKILL.md` → tasks → TodoWrite → TDD; reads `frontend-debug/SKILL.md` for UI bugs |
-| T+01:00 | flaky tests | reads `ralph-loop/SKILL.md` → writes `goal.md`+`check.sh` → `loop.sh` |
-| T+01:30 | pre-commit | reads `code-review/SKILL.md` → `review.sh HEAD` → reads result |
-| T+01:45 | session end | reads `memory/SKILL.md` → `compact.sh` → updates `memory/topics/favorites.md` |
+| T+00:05 | "Add a favorites feature" | reads `.harness/skills/brainstorming/SKILL.md` → produces `.harness/specs/2026-04-20-favorites/{spec,plan,tasks}.md` |
+| T+00:30 | implementation | reads `.harness/spec/SKILL.md` → tasks → TodoWrite → reads `.harness/skills/tdd/SKILL.md`; reads `.harness/browser-debug/SKILL.md` for UI bugs |
+| T+01:00 | flaky tests | reads `.harness/loop/SKILL.md` → writes `goal.md`+`check.sh` → `loop.sh` |
+| T+01:30 | pre-commit | reads `.harness/review/SKILL.md` → `review.sh HEAD` → reads `.harness/review/<ts>.md` |
+| T+01:45 | session end | reads `.harness/memory/SKILL.md` → `compact.sh` → updates `.harness/memory/topics/favorites.md` |
 | T+Day+1 | next session | reads AGENTS.md → memory → continues without re-asking |
 
 Six of eight modules engaged in a single canonical day. `orchestrate` and `simplify` arrive when needed via `harless add`.
@@ -557,8 +565,8 @@ Six of eight modules engaged in a single canonical day. `orchestrate` and `simpl
  skills/*    specs/<change>/    scripts/*
                    │                 │
                    ▼                 ▼
-              loop.sh ──► iter-N.log
-              review.sh ──► review-<ts>.md
+              loop.sh ──► loop/<task>/iter-N.log
+              review.sh ──► review/<ts>.md
                    │            │
                    ▼            ▼
               memory/topics/*.md ◄── compact.sh
@@ -571,7 +579,7 @@ All arrows point to plain files. No process is in the loop.
 | Phase | Trigger | Required action | Artifacts |
 |---|---|---|---|
 | Start | first user message | read AGENTS.md; if `memory` enabled, `ls memory/topics/` and grep | `memory/topics/` (read) |
-| Mid | each task | route via Skills Index; call scripts via `$AGENT_CMD` | `specs/`, `loop/`, `review-*.md` |
+| Mid | each task | route via Skills Index; call scripts via `$AGENT_CMD` | `specs/`, `loop/`, `review/*.md` |
 | End | user says "done" / completes a TodoWrite root task | `compact.sh` | `memory/sessions/<date>.md` (append), `memory/topics/*.md` (upsert) |
 
 Session end is **not auto-detected**. SKILL.md tells the agent which signal words and structural completions trigger compaction. This deliberately avoids hooks (which would break agent-agnosticism).
@@ -581,11 +589,11 @@ Session end is **not auto-detected**. SKILL.md tells the agent which signal word
 | Scenario | v0.1 behavior | Not done (over-engineering) |
 |---|---|---|
 | `loop.sh` exhausts MAX_ITER | exit 1, prints last log path | no auto prompt-rewrite, no agent swap |
-| `review.sh` finds severe issue | writes `review-<ts>.md`; main agent decides | no commit blocking, no git hook |
+| `review.sh` finds severe issue | writes `.harness/review/<ts>.md`; main agent decides | no commit blocking, no git hook |
 | `compact.sh` may include secrets | redaction checklist + README gitignore tip | no automatic secret scanner (v0.2+) |
 | Co-installed with OpenSpec | `.specs/` and `.openspec/` coexist independently | no migration tool |
 | `chrome-devtools-mcp` version drift | `doctor` prints versions and upgrade hint | no version pinning, no vendoring |
-| User edited a SKILL file | `update` 3-way diff; user resolves on conflict | no "protected mode", no intent tracking |
+| User edited a SKILL file | `update` prints unified diff; user picks `[k]eep / [o]verwrite` (per §4.5) | no "protected mode", no intent tracking |
 | Tier 1 agent inconsistency | release blocked; Tier 2/3 → issue | no runtime capability probing |
 
 Stance: **observable + user-decided** beats **automatic fallback**.
@@ -602,7 +610,7 @@ Stance: **observable + user-decided** beats **automatic fallback**.
 
 ### 9.2 Test Pyramid
 
-**Unit (vitest):** `mergeAgentsMd`, `mergeMcpJson`, `threeWayHashMerge`, `detectStack`. Coverage ≥ 80% line, ≥ 70% branch. AGENTS.md rendering uses snapshot tests.
+**Unit (vitest):** `mergeAgentsMd`, `mergeMcpJson`, `decideUpdateAction` (the v0.1 hash-compare helper that returns `keep | overwrite | conflict | recreate`), `detectStack`. Coverage ≥ 80% line, ≥ 70% branch. AGENTS.md rendering uses snapshot tests.
 
 **Integration (`execa` + temp dirs):** 8 mandatory scenarios:
 1. Empty dir `init` (default selection)
