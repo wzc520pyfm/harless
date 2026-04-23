@@ -129,7 +129,7 @@ The goal is not to replace heavy alternatives (Superpowers, OpenSpec, claude-mem
 
 1. Detect stack (`package.json` heuristics: `next`, `vite`, `react`, `remix`, `astro`, `svelte`).
 2. Detect package manager (`pnpm-lock.yaml` / `yarn.lock` / `package-lock.json`).
-3. **Monorepo handling**: if a workspaces field is detected (`pnpm-workspace.yaml`, `package.json#workspaces`, `lerna.json`), `init` runs at the **workspace root**; warns and exits 1 if invoked from inside a sub-package (with override flag `--here`).
+3. **Monorepo handling**: if a workspaces field is detected (`pnpm-workspace.yaml`, `package.json#workspaces`, `lerna.json`), `init` runs at the **workspace root**; exits 3 (PRECONDITION) if invoked from inside a sub-package, with override flag `--here`.
 4. Interactive multi-select: 6 modules pre-checked (`skills, spec, loop, memory, browser-debug, review`), 2 unchecked (`orchestrate, simplify`).
 5. Interactive multi-select: smoke-tested agent (CC, Cursor, Codex CLI, Other).
 6. Write files; merge `AGENTS.md` and `.mcp.json` if present.
@@ -743,7 +743,7 @@ This spec is the authoritative source for v0.1 design. Implementation planning (
 
 ### 13.1 Monorepo
 
-- `init` is workspace-aware: detects `pnpm-workspace.yaml`, `package.json#workspaces`, `lerna.json`. Runs at the workspace root and warns + exits 1 if invoked from a sub-package (override: `--here`).
+- `init` is workspace-aware: detects `pnpm-workspace.yaml`, `package.json#workspaces`, `lerna.json`. Runs at the workspace root and exits 3 (PRECONDITION) if invoked from a sub-package (override: `--here`).
 - `.harness/` lives **only at the workspace root**; per-package `.harness/` directories are not supported in v0.1 (and are flagged as a warning by `doctor`).
 
 ### 13.2 Coexistence with `CLAUDE.md` / `.cursorrules` / Other AI Convention Files
