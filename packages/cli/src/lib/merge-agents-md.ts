@@ -14,6 +14,27 @@ export function mergeAgentsMd(existing: string | null, blockBody: string): strin
   return existing + sep + block + "\n";
 }
 
+const SKILLS_BUNDLE_PATHS = [
+  "skills/brainstorming",
+  "skills/tdd",
+  "skills/systematic-debugging",
+  "skills/verification-before-completion",
+  "skills/receiving-review",
+];
+
+export function removeRowsFromAgentsBlock(existing: string, moduleName: string): string {
+  if (!existing.includes(BEGIN) || !existing.includes(END)) return existing;
+  const targets = moduleName === "skills" ? SKILLS_BUNDLE_PATHS : [`${moduleName}/`];
+  const beginIdx = existing.indexOf(BEGIN);
+  const endIdx = existing.indexOf(END);
+  let block = existing.slice(beginIdx, endIdx);
+  for (const t of targets) {
+    const re = new RegExp(`^.*\`\\.harness/${escapeRe(t)}[^\`]*\`.*\\n`, "gm");
+    block = block.replace(re, "");
+  }
+  return existing.slice(0, beginIdx) + block + existing.slice(endIdx);
+}
+
 export function escapeRe(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
