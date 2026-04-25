@@ -1,0 +1,62 @@
+{
+  "skills": {
+    "files": [
+      "skills/brainstorming/SKILL.md",
+      "skills/tdd/SKILL.md",
+      "skills/systematic-debugging/SKILL.md",
+      "skills/verification-before-completion/SKILL.md",
+      "skills/receiving-review/SKILL.md"
+    ]
+  },
+  "spec": {
+    "files": [
+      "spec/SKILL.md",
+      "specs/.template/spec.md",
+      "specs/.template/plan.md",
+      "specs/.template/tasks.md"
+    ]
+  },
+  "loop": {
+    "files": [
+      "loop/SKILL.md",
+      "loop/.template/goal.md",
+      "loop/.template/check.sh",
+      "scripts/loop.sh"
+    ]
+  },
+  "memory": {
+    "files": [
+      "memory/SKILL.md",
+      "scripts/compact.sh"
+    ]
+  },
+  "browser-debug": {
+    "files": [
+      "browser-debug/SKILL.md"
+    ],
+    "mcp": {
+      "chrome-devtools": {
+        "command": "npx",
+        "args": ["chrome-devtools-mcp@latest"]
+      }
+    }
+  },
+  "orchestrate": {
+    "files": [
+      "orchestrate/SKILL.md",
+      "scripts/dispatch.sh"
+    ]
+  },
+  "review": {
+    "files": [
+      "review/SKILL.md",
+      "scripts/review.sh"
+    ]
+  },
+  "simplify": {
+    "files": [
+      "simplify/SKILL.md",
+      "scripts/simplify.sh"
+    ]
+  }
+}
