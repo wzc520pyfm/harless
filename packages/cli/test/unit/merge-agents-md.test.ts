@@ -1,7 +1,12 @@
 import { describe, it, expect } from "vitest";
-import { mergeAgentsMd } from "../../src/lib/merge-agents-md.js";
+import { mergeAgentsMd, removeRowsFromAgentsBlock } from "../../src/lib/merge-agents-md.js";
+import fs from "node:fs";
+import path from "node:path";
 
 const BLOCK = `## harless block`;
+const AGENTS_TPL = fs.readFileSync(
+  path.resolve(import.meta.dirname, "../../src/templates/AGENTS.md.tpl"), "utf8",
+);
 
 describe("mergeAgentsMd", () => {
   it("creates file when AGENTS.md missing", () => {
@@ -32,5 +37,37 @@ describe("mergeAgentsMd", () => {
     const once = mergeAgentsMd(null, BLOCK);
     const twice = mergeAgentsMd(once, BLOCK);
     expect(twice).toBe(once);
+  });
+});
+
+describe("removeRowsFromAgentsBlock", () => {
+  const full = mergeAgentsMd(null, AGENTS_TPL);
+
+  it("removes loop row, others untouched", () => {
+    const out = removeRowsFromAgentsBlock(full, "loop");
+    expect(out).not.toContain("loop/SKILL.md");
+    expect(out).toContain("spec/SKILL.md");
+    expect(out).toContain("brainstorming/SKILL.md");
+  });
+
+  it("removes all 5 discipline rows for skills bundle", () => {
+    const out = removeRowsFromAgentsBlock(full, "skills");
+    expect(out).not.toContain("brainstorming/SKILL.md");
+    expect(out).not.toContain("tdd/SKILL.md");
+    expect(out).not.toContain("systematic-debugging/SKILL.md");
+    expect(out).not.toContain("verification-before-completion/SKILL.md");
+    expect(out).not.toContain("receiving-review/SKILL.md");
+    expect(out).toContain("spec/SKILL.md");
+  });
+
+  it("is idempotent (remove loop twice)", () => {
+    const once = removeRowsFromAgentsBlock(full, "loop");
+    const twice = removeRowsFromAgentsBlock(once, "loop");
+    expect(twice).toBe(once);
+  });
+
+  it("unknown module is a no-op", () => {
+    const out = removeRowsFromAgentsBlock(full, "nonexistent");
+    expect(out).toBe(full);
   });
 });
