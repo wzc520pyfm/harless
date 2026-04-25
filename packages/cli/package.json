@@ -1,0 +1,28 @@
+{
+  "name": "harless",
+  "version": "0.1.0-dev",
+  "description": "Minimal agent-agnostic AI Coding Harness kit",
+  "license": "MIT",
+  "type": "module",
+  "bin": { "harless": "./dist/bin.js" },
+  "main": "./dist/cli.js",
+  "types": "./dist/cli.d.ts",
+  "files": ["dist", "README.md"],
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@inquirer/prompts": "^7",
+    "picocolors": "^1"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "execa": "^9",
+    "typescript": "^5",
+    "vitest": "^2"
+  }
+}
