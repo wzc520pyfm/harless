@@ -9,7 +9,7 @@
 
 ## 1. Project Statement
 
-`harless` is an **agent-agnostic, minimal AI Coding Harness kit**. Through `npx harless init` / `add`, it injects 8 capability modules into a user's project as plain markdown files and shell scripts. Any AI agent that respects the [`AGENTS.md`](https://agents.md) convention (Claude Code, Cursor, Codex CLI, Copilot CLI, Gemini CLI, …) gains an immediate, complete production loop:
+`harless` is an **agent-agnostic, minimal AI Coding Harness kit**. Through `npx harless init` / `add`, it injects 8 capability modules into a user's project as plain markdown files and shell scripts. Any AI agent that respects the `[AGENTS.md](https://agents.md)` convention (Claude Code, Cursor, Codex CLI, Copilot CLI, Gemini CLI, …) gains an immediate, complete production loop:
 
 > Skills · Spec · Loop · Memory · Browser-Debug · Orchestration · Review · Simplify
 
@@ -28,16 +28,18 @@ The goal is not to replace heavy alternatives (Superpowers, OpenSpec, claude-mem
 
 ## 2. Locked Architectural Decisions
 
-| # | Decision | Rationale |
-|---|---|---|
-| D1 | **Agent-agnostic** via `AGENTS.md` + Read tool + non-interactive CLI | Avoids per-agent adapter sprawl; serves global developers |
-| D2 | **CLI-injected files (shadcn/OpenSpec style)** via `npx harless init` / `add` | Code lives in user's repo; trivial fork & customize |
-| D3 | **Two primitives only**: Markdown + Shell/Node scripts | Keeps the surface tiny and learnable |
-| D4 | External MCP only — reuse `chrome-devtools-mcp`, no self-built MCP | YAGNI; community already maintains it |
-| D5 | **Web-first defaults + generic degradation** | Auto-detect Next/Vite/React; degrade via `--stack=generic` |
-| D6 | **Smoke-tested on Tier 1 = CC, Cursor, Codex CLI** | Three formats represent the field; others are AGENTS.md-compatible |
-| D7 | **No daemons, no hooks, no global config writes** | Zero side effects on user's machine |
-| D8 | Project name = **`harless`** | Short, unique, self-evidently "harness minus weight" |
+
+| #   | Decision                                                                      | Rationale                                                          |
+| --- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| D1  | **Agent-agnostic** via `AGENTS.md` + Read tool + non-interactive CLI          | Avoids per-agent adapter sprawl; serves global developers          |
+| D2  | **CLI-injected files (shadcn/OpenSpec style)** via `npx harless init` / `add` | Code lives in user's repo; trivial fork & customize                |
+| D3  | **Two primitives only**: Markdown + Shell/Node scripts                        | Keeps the surface tiny and learnable                               |
+| D4  | External MCP only — reuse `chrome-devtools-mcp`, no self-built MCP            | YAGNI; community already maintains it                              |
+| D5  | **Web-first defaults + generic degradation**                                  | Auto-detect Next/Vite/React; degrade via `--stack=generic`         |
+| D6  | **Smoke-tested on Tier 1 = CC, Cursor, Codex CLI**                            | Three formats represent the field; others are AGENTS.md-compatible |
+| D7  | **No daemons, no hooks, no global config writes**                             | Zero side effects on user's machine                                |
+| D8  | Project name = `**harless`**                                                  | Short, unique, self-evidently "harness minus weight"               |
+
 
 ### 2.1 Five Design Axioms (Inviolable)
 
@@ -90,13 +92,15 @@ The goal is not to replace heavy alternatives (Superpowers, OpenSpec, claude-mem
 
 ### 4.1 Commands
 
-| Command | Purpose | Idempotent |
-|---|---|---|
-| `harless init` | Detect stack, interactively select modules, write files | ✅ |
-| `harless add <module>` | Add one module after init | ✅ |
-| `harless remove <module>` | Remove one module (with hash-aware safety) | ✅ |
-| `harless update` | Hash-based update with `[k]eep / [o]verwrite` per file | ✅ |
-| `harless doctor` | Inspect environment, agent config, MCP, permissions | ✅ (read-only) |
+
+| Command                   | Purpose                                                 | Idempotent    |
+| ------------------------- | ------------------------------------------------------- | ------------- |
+| `harless init`            | Detect stack, interactively select modules, write files | ✅             |
+| `harless add <module>`    | Add one module after init                               | ✅             |
+| `harless remove <module>` | Remove one module (with hash-aware safety)              | ✅             |
+| `harless update`          | Hash-based update with `[k]eep / [o]verwrite` per file  | ✅             |
+| `harless doctor`          | Inspect environment, agent config, MCP, permissions     | ✅ (read-only) |
+
 
 **Global flags (apply to all commands):**
 
@@ -107,23 +111,27 @@ The goal is not to replace heavy alternatives (Superpowers, OpenSpec, claude-mem
 
 ### 4.2 Exit-Code Convention (consolidated)
 
-| Exit | Meaning | Used by |
-|---|---|---|
-| `0` | success | all commands |
-| `1` | unrecoverable error (filesystem, network, malformed config) | all commands |
-| `2` | unresolved conflict / user input required but `--yes` was set | `init`, `add`, `update`, `remove` |
-| `3` | precondition failed (Node version, missing dependency) | all commands |
-| `10`+ | `doctor` only: bitmask of failing checks (10=AGENTS, 11=MCP, 12=perms, …) | `doctor` |
+
+| Exit  | Meaning                                                                   | Used by                           |
+| ----- | ------------------------------------------------------------------------- | --------------------------------- |
+| `0`   | success                                                                   | all commands                      |
+| `1`   | unrecoverable error (filesystem, network, malformed config)               | all commands                      |
+| `2`   | unresolved conflict / user input required but `--yes` was set             | `init`, `add`, `update`, `remove` |
+| `3`   | precondition failed (Node version, missing dependency)                    | all commands                      |
+| `10`+ | `doctor` only: bitmask of failing checks (10=AGENTS, 11=MCP, 12=perms, …) | `doctor`                          |
+
 
 ### 4.3 `--yes` Semantics per Command
 
-| Command | With `--yes` | Without |
-|---|---|---|
-| `init` | use defaults; on AGENTS.md/MCP merge conflict → exit 2 | interactive prompts |
-| `add <m>` | overwrite-if-pristine, exit 2 if user-modified | prompt `[k]eep / [o]verwrite` |
-| `update` | overwrite-if-pristine, exit 2 if conflict | prompt `[k]eep / [o]verwrite` |
+
+| Command      | With `--yes`                                                                          | Without                                              |
+| ------------ | ------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| `init`       | use defaults; on AGENTS.md/MCP merge conflict → exit 2                                | interactive prompts                                  |
+| `add <m>`    | overwrite-if-pristine, exit 2 if user-modified                                        | prompt `[k]eep / [o]verwrite`                        |
+| `update`     | overwrite-if-pristine, exit 2 if conflict                                             | prompt `[k]eep / [o]verwrite`                        |
 | `remove <m>` | delete pristine files; move user-modified files to `.harness/.trash/<ts>/` (per §4.6) | per-file `[d]elete / [t]rash / [k]eep` prompt (§4.6) |
-| `doctor` | n/a (read-only) | n/a |
+| `doctor`     | n/a (read-only)                                                                       | n/a                                                  |
+
 
 ### 4.4 `init` Behavior
 
@@ -141,24 +149,27 @@ The goal is not to replace heavy alternatives (Superpowers, OpenSpec, claude-mem
 
 Each templated file's SHA-256 is recorded in `.harness/config.json` at install time. On `update`:
 
-| Disk hash vs old template | New template vs old template | v0.1 action |
-|---|---|---|
-| same | changed | silent overwrite |
-| changed | same | leave disk untouched |
-| changed | changed | print unified diff; user picks `[k]eep / [o]verwrite` |
-| missing | n/a | offer to recreate |
 
-**`[m]erge` (3-way text merge via `git merge-file`) is deferred to v0.2.** v0.1 deliberately ships only the two safe options to keep the CLI ≤ 500 LOC and the conflict UX trivially understandable. Users who want a real merge can manually run `git merge-file` themselves; the diff output prints both sides verbatim.
+| Disk hash vs old template | New template vs old template | v0.1 action                                           |
+| ------------------------- | ---------------------------- | ----------------------------------------------------- |
+| same                      | changed                      | silent overwrite                                      |
+| changed                   | same                         | leave disk untouched                                  |
+| changed                   | changed                      | print unified diff; user picks `[k]eep / [o]verwrite` |
+| missing                   | n/a                          | offer to recreate                                     |
+
+
+`**[m]erge` (3-way text merge via `git merge-file`) is deferred to v0.2.** v0.1 deliberately ships only the two safe options to keep the CLI ≤ 500 LOC and the conflict UX trivially understandable. Users who want a real merge can manually run `git merge-file` themselves; the diff output prints both sides verbatim.
 
 **No automatic clobber on conflict, ever.**
 
 ### 4.6 `remove` Behavior
 
 For each file the module owns:
+
 1. If file's hash matches recorded template hash → delete (file was never edited).
 2. If file's hash differs → file is user-modified:
-   - Without `--yes`: prompt `[d]elete / [t]rash / [k]eep` (default trash).
-   - With `--yes`: move to `.harness/.trash/<YYYY-MM-DD-HH-MM-SS>/` (preserving relative path), then update `config.json`.
+  - Without `--yes`: prompt `[d]elete / [t]rash / [k]eep` (default trash).
+  - With `--yes`: move to `.harness/.trash/<YYYY-MM-DD-HH-MM-SS>/` (preserving relative path), then update `config.json`.
 3. Always remove the corresponding entries from `AGENTS.md`'s Skills Index table and the module's section in `config.json`.
 
 Trash is never auto-purged in v0.1; user can `rm -rf` when ready.
@@ -233,17 +244,19 @@ Note `loop/` and `loop/SKILL.md` coexist: the SKILL.md is the module entry point
 
 ### 5.2 Size Budget
 
-| Type | Files | Max LOC each | Total budget |
-|---|---|---|---|
-| Discipline `SKILL.md` (under `skills/`) | 5 | 100 | ≤ 500 |
-| Module `SKILL.md` (the other 7) | 7 | 100 | ≤ 700 |
-| `scripts/*.sh` | 5 | 80 | ≤ 400 |
-| `specs/.template/*` | 3 | 50 | ≤ 150 |
-| `loop/.template/*` | 2 | 10 | ≤ 20 |
-| `AGENTS.md` harless block | 1 | 60 | ≤ 60 |
-| **Injected total** | | | **≤ 1830 LOC** |
-| CLI source | — | — | **≤ 500 LOC** |
-| **Whole project** | | | **≤ 2330 LOC** |
+
+| Type                                    | Files | Max LOC each | Total budget   |
+| --------------------------------------- | ----- | ------------ | -------------- |
+| Discipline `SKILL.md` (under `skills/`) | 5     | 100          | ≤ 500          |
+| Module `SKILL.md` (the other 7)         | 7     | 100          | ≤ 700          |
+| `scripts/*.sh`                          | 5     | 80           | ≤ 400          |
+| `specs/.template/*`                     | 3     | 50           | ≤ 150          |
+| `loop/.template/*`                      | 2     | 10           | ≤ 20           |
+| `AGENTS.md` harless block               | 1     | 60           | ≤ 60           |
+| **Injected total**                      |       |              | **≤ 1830 LOC** |
+| CLI source                              | —     | —            | **≤ 500 LOC**  |
+| **Whole project**                       |       |              | **≤ 2330 LOC** |
+
 
 This is the concrete commitment behind "minimal". Note: budget tightened from 120 LOC/SKILL to 100 LOC/SKILL to absorb the additional discipline files; total stays in the same order of magnitude.
 
@@ -392,7 +405,7 @@ echo "✗ max iterations reached"; exit 1
 **I/O contract** (resolves the "fresh process can't read transcript" issue):
 
 - The **calling agent** authors the summary in markdown using its in-context conversation. The script does NOT call any LLM.
-- **`scripts/compact.sh`** is a thin appender: it reads markdown from **stdin**, prepends a timestamp header, and appends to `.harness/memory/sessions/<YYYY-MM-DD>.md`.
+- `**scripts/compact.sh`** is a thin appender: it reads markdown from **stdin**, prepends a timestamp header, and appends to `.harness/memory/sessions/<YYYY-MM-DD>.md`.
 - Topic files in `.harness/memory/topics/<topic>.md` are written by the agent **directly** (using its Write tool); no script involved. The agent picks topic names matching keywords used at session start.
 - **Read**: SKILL.md instructs the agent to `ls .harness/memory/topics/` and `grep` for relevant terms at session start.
 - **Filename = retrieval key** (`auth.md`, `deploy-netlify.md`, …).
@@ -481,6 +494,7 @@ Pure-skill primarily; `scripts/simplify.sh` is an accelerator following the same
 ### 6.9 Common Script Conventions
 
 All scripts honor:
+
 1. `$AGENT_CMD` env (default `claude -p`) for cross-agent. Each script's header lists 3 example invocations (CC / Cursor / Codex).
 2. `set -euo pipefail` for fail-loud behavior.
 3. Output artifacts to `.harness/<module>/<timestamp>.{log,md}` (never to `.harness/<module>-<timestamp>` at the root).
@@ -493,13 +507,15 @@ All scripts honor:
 
 ### 7.1 Capability Matrix
 
-| Agent | Reads AGENTS.md | Read tool | Terminal tool | Non-interactive CLI | MCP path |
-|---|---|---|---|---|---|
-| Claude Code | ✅ | ✅ | ✅ | `claude -p` | `.mcp.json` |
-| Cursor | ✅ | ✅ | ✅ | `cursor-agent -p` | `.cursor/mcp.json` or `.mcp.json` |
-| Codex CLI | ✅ | ✅ | ✅ | `codex exec` | `~/.codex/config.toml` (global) |
-| Copilot CLI | ✅ | ✅ | ✅ | `copilot -p` | varies |
-| Gemini CLI | ✅ | ✅ | ✅ | `gemini -p` | `.gemini/settings.json` |
+
+| Agent       | Reads AGENTS.md | Read tool | Terminal tool | Non-interactive CLI | MCP path                          |
+| ----------- | --------------- | --------- | ------------- | ------------------- | --------------------------------- |
+| Claude Code | ✅               | ✅         | ✅             | `claude -p`         | `.mcp.json`                       |
+| Cursor      | ✅               | ✅         | ✅             | `cursor-agent -p`   | `.cursor/mcp.json` or `.mcp.json` |
+| Codex CLI   | ✅               | ✅         | ✅             | `codex exec`        | `~/.codex/config.toml` (global)   |
+| Copilot CLI | ✅               | ✅         | ✅             | `copilot -p`        | varies                            |
+| Gemini CLI  | ✅               | ✅         | ✅             | `gemini -p`         | `.gemini/settings.json`           |
+
 
 ### 7.2 Four Differences We Resolve
 
@@ -525,15 +541,17 @@ Run on each Tier 1 agent: ask `"Please help me turn this idea into a design spec
 
 The following claims must be empirically validated **before CLI implementation begins**. Failures may force redesign; surface to maintainer.
 
-| # | Claim | How to verify | Fallback if false |
-|---|---|---|---|
-| V1 | CC's native `Skill` tool auto-discovers SKILL files under arbitrary project paths (`.harness/skills/...`), not only `~/.claude/skills/` | In a CC session: place a SKILL.md at `.harness/skills/foo/SKILL.md`, ask a query matching its `description`, observe whether CC auto-loads it (vs. only after explicit Read) | If only-explicit: ALL skill activation flows through AGENTS.md index reads; remove "native auto-trigger" claim from §5.4 |
-| V2 | Cursor reads project-root `.mcp.json` (in addition to `.cursor/mcp.json`) | Place `.mcp.json` at project root with a known MCP server, restart Cursor, verify in MCP panel | If false: `init` writes to `.cursor/mcp.json` instead, doctor checks both paths |
-| V3 | Codex CLI follows imperative instructions like "read this file before acting" placed in AGENTS.md | In a Codex session: minimal AGENTS.md with `When you receive any request, first read .harness/skills/foo/SKILL.md`, send a generic request, observe transcript | If false: AGENTS.md must inline more critical instructions; deeper SKILL nesting becomes a v0.2 risk |
-| V4 | `cursor-agent -p "<prompt>"` exists as a non-interactive invocation in 2026 | Run `cursor-agent --help` and `cursor-agent -p "echo hi"` | If false: discover the actual flag (likely `--print` or `--prompt`); update `$AGENT_CMD` examples |
-| V5 | `copilot -p "<prompt>"` exists for Copilot CLI's coding agent | Run `copilot --help` | If false: tier-2 agent removed from default examples; Tier 2 status retained only if any non-interactive mode exists |
-| V6 | `chrome-devtools-mcp` package name and config schema are stable in 2026 | `npm view chrome-devtools-mcp` and current README check | If renamed/forked: update `init`'s injected MCP block |
-| V7 | Project-root `AGENTS.md` is read by CC, Cursor, and Codex CLI as primary convention (vs. `CLAUDE.md`, `.cursorrules`) | Each agent's docs check + a "hello, can you see AGENTS.md?" probe | If an agent prefers a different file: `init` writes a 1-line **shim** in that agent's preferred file (e.g., `CLAUDE.md` containing only `Read AGENTS.md and follow it.`); shim is hash-tracked like other generated files. Tier downgrade considered if shim still fails to route. |
+
+| #   | Claim                                                                                                                                   | How to verify                                                                                                                                                                | Fallback if false                                                                                                                                                                                                                                                                  |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| V1  | CC's native `Skill` tool auto-discovers SKILL files under arbitrary project paths (`.harness/skills/...`), not only `~/.claude/skills/` | In a CC session: place a SKILL.md at `.harness/skills/foo/SKILL.md`, ask a query matching its `description`, observe whether CC auto-loads it (vs. only after explicit Read) | If only-explicit: ALL skill activation flows through AGENTS.md index reads; remove "native auto-trigger" claim from §5.4                                                                                                                                                           |
+| V2  | Cursor reads project-root `.mcp.json` (in addition to `.cursor/mcp.json`)                                                               | Place `.mcp.json` at project root with a known MCP server, restart Cursor, verify in MCP panel                                                                               | If false: `init` writes to `.cursor/mcp.json` instead, doctor checks both paths                                                                                                                                                                                                    |
+| V3  | Codex CLI follows imperative instructions like "read this file before acting" placed in AGENTS.md                                       | In a Codex session: minimal AGENTS.md with `When you receive any request, first read .harness/skills/foo/SKILL.md`, send a generic request, observe transcript               | If false: AGENTS.md must inline more critical instructions; deeper SKILL nesting becomes a v0.2 risk                                                                                                                                                                               |
+| V4  | `cursor-agent -p "<prompt>"` exists as a non-interactive invocation in 2026                                                             | Run `cursor-agent --help` and `cursor-agent -p "echo hi"`                                                                                                                    | If false: discover the actual flag (likely `--print` or `--prompt`); update `$AGENT_CMD` examples                                                                                                                                                                                  |
+| V5  | `copilot -p "<prompt>"` exists for Copilot CLI's coding agent                                                                           | Run `copilot --help`                                                                                                                                                         | If false: tier-2 agent removed from default examples; Tier 2 status retained only if any non-interactive mode exists                                                                                                                                                               |
+| V6  | `chrome-devtools-mcp` package name and config schema are stable in 2026                                                                 | `npm view chrome-devtools-mcp` and current README check                                                                                                                      | If renamed/forked: update `init`'s injected MCP block                                                                                                                                                                                                                              |
+| V7  | Project-root `AGENTS.md` is read by CC, Cursor, and Codex CLI as primary convention (vs. `CLAUDE.md`, `.cursorrules`)                   | Each agent's docs check + a "hello, can you see AGENTS.md?" probe                                                                                                            | If an agent prefers a different file: `init` writes a 1-line **shim** in that agent's preferred file (e.g., `CLAUDE.md` containing only `Read AGENTS.md and follow it.`); shim is hash-tracked like other generated files. Tier downgrade considered if shim still fails to route. |
+
 
 A short script `scripts/verify.sh` SHOULD be authored as the first implementation task, automating V4–V6 and providing manual-step instructions for V1–V3, V7. Verification results land in `docs/smoke/verification.md` and are cited in the v0.1.0 release notes.
 
@@ -543,15 +561,17 @@ A short script `scripts/verify.sh` SHOULD be authored as the first implementatio
 
 ### 8.1 Canonical Developer Day
 
-| Time | Event | Agent action |
-|---|---|---|
-| T+00:00 | `npx harless init` | — |
-| T+00:05 | "Add a favorites feature" | reads `.harness/skills/brainstorming/SKILL.md` → produces `.harness/specs/2026-04-20-favorites/{spec,plan,tasks}.md` |
-| T+00:30 | implementation | reads `.harness/spec/SKILL.md` → tasks → TodoWrite → reads `.harness/skills/tdd/SKILL.md`; reads `.harness/browser-debug/SKILL.md` for UI bugs |
-| T+01:00 | flaky tests | reads `.harness/loop/SKILL.md` → writes `goal.md`+`check.sh` → `loop.sh` |
-| T+01:30 | pre-commit | reads `.harness/review/SKILL.md` → `review.sh HEAD` → reads `.harness/review/<ts>.md` |
-| T+01:45 | session end | reads `.harness/memory/SKILL.md` → `compact.sh` → updates `.harness/memory/topics/favorites.md` |
-| T+Day+1 | next session | reads AGENTS.md → memory → continues without re-asking |
+
+| Time    | Event                     | Agent action                                                                                                                                   |
+| ------- | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| T+00:00 | `npx harless init`        | —                                                                                                                                              |
+| T+00:05 | "Add a favorites feature" | reads `.harness/skills/brainstorming/SKILL.md` → produces `.harness/specs/2026-04-20-favorites/{spec,plan,tasks}.md`                           |
+| T+00:30 | implementation            | reads `.harness/spec/SKILL.md` → tasks → TodoWrite → reads `.harness/skills/tdd/SKILL.md`; reads `.harness/browser-debug/SKILL.md` for UI bugs |
+| T+01:00 | flaky tests               | reads `.harness/loop/SKILL.md` → writes `goal.md`+`check.sh` → `loop.sh`                                                                       |
+| T+01:30 | pre-commit                | reads `.harness/review/SKILL.md` → `review.sh HEAD` → reads `.harness/review/<ts>.md`                                                          |
+| T+01:45 | session end               | reads `.harness/memory/SKILL.md` → `compact.sh` → updates `.harness/memory/topics/favorites.md`                                                |
+| T+Day+1 | next session              | reads AGENTS.md → memory → continues without re-asking                                                                                         |
+
 
 Six of eight modules engaged in a single canonical day. `orchestrate` and `simplify` arrive when needed via `harless add`.
 
@@ -576,25 +596,29 @@ All arrows point to plain files. No process is in the loop.
 
 ### 8.3 Session Phases
 
-| Phase | Trigger | Required action | Artifacts |
-|---|---|---|---|
-| Start | first user message | read AGENTS.md; if `memory` enabled, `ls memory/topics/` and grep | `memory/topics/` (read) |
-| Mid | each task | route via Skills Index; call scripts via `$AGENT_CMD` | `specs/`, `loop/`, `review/*.md` |
-| End | user says "done" / completes a TodoWrite root task | `compact.sh` | `memory/sessions/<date>.md` (append), `memory/topics/*.md` (upsert) |
+
+| Phase | Trigger                                            | Required action                                                   | Artifacts                                                           |
+| ----- | -------------------------------------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------- |
+| Start | first user message                                 | read AGENTS.md; if `memory` enabled, `ls memory/topics/` and grep | `memory/topics/` (read)                                             |
+| Mid   | each task                                          | route via Skills Index; call scripts via `$AGENT_CMD`             | `specs/`, `loop/`, `review/*.md`                                    |
+| End   | user says "done" / completes a TodoWrite root task | `compact.sh`                                                      | `memory/sessions/<date>.md` (append), `memory/topics/*.md` (upsert) |
+
 
 Session end is **not auto-detected**. SKILL.md tells the agent which signal words and structural completions trigger compaction. This deliberately avoids hooks (which would break agent-agnosticism).
 
 ### 8.4 Failure Modes (decision matrix)
 
-| Scenario | v0.1 behavior | Not done (over-engineering) |
-|---|---|---|
-| `loop.sh` exhausts MAX_ITER | exit 1, prints last log path | no auto prompt-rewrite, no agent swap |
-| `review.sh` finds severe issue | writes `.harness/review/<ts>.md`; main agent decides | no commit blocking, no git hook |
-| `compact.sh` may include secrets | redaction checklist + README gitignore tip | no automatic secret scanner (v0.2+) |
-| Co-installed with OpenSpec | `.specs/` and `.openspec/` coexist independently | no migration tool |
-| `chrome-devtools-mcp` version drift | `doctor` prints versions and upgrade hint | no version pinning, no vendoring |
-| User edited a SKILL file | `update` prints unified diff; user picks `[k]eep / [o]verwrite` (per §4.5) | no "protected mode", no intent tracking |
-| Tier 1 agent inconsistency | release blocked; Tier 2/3 → issue | no runtime capability probing |
+
+| Scenario                            | v0.1 behavior                                                              | Not done (over-engineering)             |
+| ----------------------------------- | -------------------------------------------------------------------------- | --------------------------------------- |
+| `loop.sh` exhausts MAX_ITER         | exit 1, prints last log path                                               | no auto prompt-rewrite, no agent swap   |
+| `review.sh` finds severe issue      | writes `.harness/review/<ts>.md`; main agent decides                       | no commit blocking, no git hook         |
+| `compact.sh` may include secrets    | redaction checklist + README gitignore tip                                 | no automatic secret scanner (v0.2+)     |
+| Co-installed with OpenSpec          | `.specs/` and `.openspec/` coexist independently                           | no migration tool                       |
+| `chrome-devtools-mcp` version drift | `doctor` prints versions and upgrade hint                                  | no version pinning, no vendoring        |
+| User edited a SKILL file            | `update` prints unified diff; user picks `[k]eep / [o]verwrite` (per §4.5) | no "protected mode", no intent tracking |
+| Tier 1 agent inconsistency          | release blocked; Tier 2/3 → issue                                          | no runtime capability probing           |
+
 
 Stance: **observable + user-decided** beats **automatic fallback**.
 
@@ -613,6 +637,7 @@ Stance: **observable + user-decided** beats **automatic fallback**.
 **Unit (vitest):** `mergeAgentsMd`, `mergeMcpJson`, `decideUpdateAction` (the v0.1 hash-compare helper that returns `keep | overwrite | conflict | recreate`), `detectStack`. Coverage ≥ 80% line, ≥ 70% branch. AGENTS.md rendering uses snapshot tests.
 
 **Integration (`execa` + temp dirs):** 8 mandatory scenarios:
+
 1. Empty dir `init` (default selection)
 2. `init` over existing AGENTS.md containing an `openspec` block
 3. `init → add orchestrate → remove orchestrate`
@@ -668,6 +693,7 @@ harless/
 ### 9.5 Documentation
 
 VitePress site + README:
+
 - README — 10-minute onboarding (install → init → first brainstorm → first loop)
 - Getting Started — same, longer, with troubleshooting
 - One page per module
@@ -689,14 +715,16 @@ VitePress site + README:
 
 ### 9.8 Roadmap (v0.2+ candidates, not committed)
 
-| Candidate | Rationale to defer | Trigger to promote |
-|---|---|---|
-| Self-built `harless-mcp` | external MCP suffices for v0.1 | users find `grep memory/` insufficient |
-| `harless spec validate` | requires schema engineering | ≥ 3 user spec corpora |
-| Windows support | shell scripts need PowerShell ports | Windows-user issues filed |
-| Module plugin registry | needs design + signing | core stable post-v0.x |
-| Multi-agent pipeline orchestration | exceeds "minimal" boundary | concrete user scenarios |
-| VS Code extension | violates agent-agnostic | as separate optional repo |
+
+| Candidate                          | Rationale to defer                  | Trigger to promote                     |
+| ---------------------------------- | ----------------------------------- | -------------------------------------- |
+| Self-built `harless-mcp`           | external MCP suffices for v0.1      | users find `grep memory/` insufficient |
+| `harless spec validate`            | requires schema engineering         | ≥ 3 user spec corpora                  |
+| Windows support                    | shell scripts need PowerShell ports | Windows-user issues filed              |
+| Module plugin registry             | needs design + signing              | core stable post-v0.x                  |
+| Multi-agent pipeline orchestration | exceeds "minimal" boundary          | concrete user scenarios                |
+| VS Code extension                  | violates agent-agnostic             | as separate optional repo              |
+
 
 ---
 
@@ -707,9 +735,9 @@ A v0.1 release is "done" when **all** of the following are true:
 1. CLI source ≤ 500 LOC; injected templates total ≤ 1830 LOC (per §5.2 budget table).
 2. All 5 CLI commands (`init / add / update / remove / doctor`) implemented and idempotent; exit codes follow §4.2.
 3. All 8 capability modules present:
-   - `skills` → 5 discipline SKILL files under `.harness/skills/`
-   - `spec / loop / memory / browser-debug / orchestrate / review / simplify` → one `SKILL.md` each
-   - `loop / compact / review / dispatch / simplify` scripts present, `chmod +x`, and ≤ 80 LOC each
+  - `skills` → 5 discipline SKILL files under `.harness/skills/`
+  - `spec / loop / memory / browser-debug / orchestrate / review / simplify` → one `SKILL.md` each
+  - `loop / compact / review / dispatch / simplify` scripts present, `chmod +x`, and ≤ 80 LOC each
 4. Unit tests ≥ 80% line / ≥ 70% branch coverage on the four merge/detect functions.
 5. All 8 integration scenarios (§9.2) green in CI.
 6. Pre-implementation verification checklist (§7.5) executed; `docs/smoke/verification.md` filed.
@@ -727,8 +755,8 @@ Promoted from the previous "Open Questions" section to remove implementer ambigu
 
 - **Template engine**: hand-rolled string interpolation. Zero template-engine dependency.
 - **Prompts library**: `@inquirer/prompts` (active maintenance, ESM).
-- **`dispatch.sh` input format**: JSON (`tasks.json`). No yaml dep.
-- **`compact.sh` summary prompt customization**: out of v0.1.
+- `**dispatch.sh` input format**: JSON (`tasks.json`). No yaml dep.
+- `**compact.sh` summary prompt customization**: out of v0.1.
 - **CLI language / locale**: English only in v0.1. i18n is v0.2+.
 
 ---

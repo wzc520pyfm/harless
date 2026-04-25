@@ -22,21 +22,21 @@ pnpm -r test
 
 1. **Minimal primitives.** Markdown + shell scripts only — no new DSLs.
 2. **Zero runtime.** The injected harness must have no daemon, hook, or
-   background process.
+  background process.
 3. **Agent-agnostic by default.** Any CLI example that references a specific
-   agent (`claude -p`, `cursor-agent -p`, etc.) must be labelled as such and
+  agent (`claude -p`, `cursor-agent -p`, etc.) must be labelled as such and
    overridable via `$AGENT_CMD`.
 4. **Test-driven.** Every pure function under `packages/cli/src/lib/` ships
-   with a vitest unit test.
+  with a vitest unit test.
 5. **Small PRs.** Keep PRs under ~300 LOC where possible; call out any LOC
-   budget impact explicitly.
+  budget impact explicitly.
 
 ## Reporting issues
 
 - Open an issue describing the expected vs. actual behaviour and the agent
-  CLI you were using.
+CLI you were using.
 - For cross-agent regressions, include output from `npx harless doctor`
-  (once implemented).
+(once implemented).
 
 ## Code of conduct
 
