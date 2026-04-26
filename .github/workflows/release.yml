@@ -3,10 +3,27 @@ on:
   push:
     tags: ['v*']
 jobs:
-  publish:
+  # Always runs on tag: same checks as local `pnpm release` (install, build, test).
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm -r build
+      - run: pnpm -r test
+
+  # Optional: only when repository secret NPM_TOKEN is set (OIDC provenance).
+  publish-npm:
+    needs: verify
+    if: secrets.NPM_TOKEN != ''
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
       id-token: write
     steps:
       - uses: actions/checkout@v4
@@ -18,13 +35,12 @@ jobs:
           registry-url: https://registry.npmjs.org
       - run: pnpm install --frozen-lockfile
       - run: pnpm -r build
-      - run: pnpm -r test
       - run: pnpm -F harless publish --provenance --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   github-release:
-    needs: publish
+    needs: verify
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -34,6 +50,7 @@ jobs:
         id: notes
         env:
           TAG_NAME: ${{ github.ref_name }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
         run: |
           VERSION="${TAG_NAME#v}"
           NOTES="${RUNNER_TEMP}/release-notes.md"
@@ -46,7 +63,7 @@ jobs:
             {
               echo "## ${TAG_NAME}"
               echo
-              echo "See [CHANGELOG.md](https://github.com/nicepkg/harless/blob/${TAG_NAME}/CHANGELOG.md) for details."
+              echo "See [CHANGELOG.md](https://github.com/${GITHUB_REPOSITORY}/blob/${TAG_NAME}/CHANGELOG.md) for details."
             } > "$NOTES"
           fi
           echo "path=${NOTES}" >> "$GITHUB_OUTPUT"
