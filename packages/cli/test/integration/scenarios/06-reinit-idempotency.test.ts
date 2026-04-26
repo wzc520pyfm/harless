@@ -13,11 +13,11 @@ afterEach(() => { process.chdir(orig); rmSync(cwd, { recursive: true, force: tru
 describe("scenario 06: reinit idempotency", () => {
   it("running init twice produces identical output", async () => {
     await run(["init", "--yes", "--modules=skills,loop"]);
-    const cfg1 = readFileSync(path.join(cwd, ".harness/config.json"), "utf8");
+    const cfg1 = readFileSync(path.join(cwd, ".agents/config.json"), "utf8");
     const md1 = readFileSync(path.join(cwd, "AGENTS.md"), "utf8");
 
     await run(["init", "--yes"]);
-    const cfg2 = readFileSync(path.join(cwd, ".harness/config.json"), "utf8");
+    const cfg2 = readFileSync(path.join(cwd, ".agents/config.json"), "utf8");
     const md2 = readFileSync(path.join(cwd, "AGENTS.md"), "utf8");
 
     const c1 = JSON.parse(cfg1);

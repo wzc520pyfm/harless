@@ -1,4 +1,4 @@
-# .harness/
+# .agents/
 
 This directory is managed by [harless](https://github.com/nicepkg/harless) — a
 minimal, agent-agnostic AI Coding Harness. You own every file here; edit freely.
@@ -21,25 +21,27 @@ minimal, agent-agnostic AI Coding Harness. You own every file here; edit freely.
 
 ```bash
 # Ralph loop (iterates until check.sh passes)
-bash .harness/scripts/loop.sh .harness/loop/my-task
+bash .agents/scripts/loop.sh .agents/loop/my-task
 
 # Append a session summary to memory
-echo "## Summary\n- Fixed auth bug" | bash .harness/scripts/compact.sh
+echo "## Summary\n- Fixed auth bug" | bash .agents/scripts/compact.sh
 
 # Independent code review of staged changes
-bash .harness/scripts/review.sh HEAD
+bash .agents/scripts/review.sh HEAD
 ```
 
 Override the agent CLI with `$AGENT_CMD`:
 
 ```bash
-AGENT_CMD="cursor-agent -p" bash .harness/scripts/review.sh
-AGENT_CMD="codex exec"      bash .harness/scripts/dispatch.sh tasks.json
+AGENT_CMD="cursor-agent -p" bash .agents/scripts/review.sh
+AGENT_CMD="codex exec"      bash .agents/scripts/dispatch.sh tasks.json
 ```
 
 ## Cross-agent MCP config
 
-harless writes `.mcp.json` at the project root (Claude Code + Cursor).
+harless writes **`.mcp.json`** at the project root (Claude Code) and **`.cursor/mcp.json`**
+(Cursor). Keep both in sync if you edit MCP servers by hand.
+
 For other agents, add the MCP server manually:
 
 **Codex CLI** (`~/.codex/config.toml`):
@@ -58,7 +60,7 @@ args = ["chrome-devtools-mcp@latest"]
 
 ```bash
 npx harless remove <module>   # remove a specific module
-rm -rf .harness               # remove everything
+rm -rf .agents               # remove everything
 ```
 
 Then remove the `<!-- BEGIN harless v0.1 -->` block from `AGENTS.md`.

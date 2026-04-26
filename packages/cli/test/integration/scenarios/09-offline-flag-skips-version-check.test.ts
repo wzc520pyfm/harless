@@ -13,7 +13,7 @@ afterEach(() => { process.chdir(orig); rmSync(cwd, { recursive: true, force: tru
 describe("scenario 09: --offline flag", () => {
   it("init completes with --offline --yes", async () => {
     await run(["init", "--yes", "--offline", "--modules=skills"]);
-    expect(existsSync(path.join(cwd, ".harness/config.json"))).toBe(true);
+    expect(existsSync(path.join(cwd, ".agents/config.json"))).toBe(true);
     expect(existsSync(path.join(cwd, "AGENTS.md"))).toBe(true);
   });
 

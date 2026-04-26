@@ -4,16 +4,16 @@ Independent agent scan for unnecessary complexity.
 
 ## Files
 
-- `.harness/simplify/SKILL.md`
-- `.harness/scripts/simplify.sh`
+- `.agents/simplify/SKILL.md`
+- `.agents/scripts/simplify.sh`
 
 ## Usage
 
 ```bash
-bash .harness/scripts/simplify.sh src/
+bash .agents/scripts/simplify.sh src/
 ```
 
-Output: `.harness/simplify/<timestamp>.md`
+Output: `.agents/simplify/<timestamp>.md`
 
 Targets: dead code, over-abstraction, redundant wrappers, excessive
 indirection, copy-paste duplication, premature optimization.

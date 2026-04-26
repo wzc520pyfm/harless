@@ -6,13 +6,21 @@ import { decideUpdateAction } from "../lib/decide-update-action.js";
 import { loadManifest, loadAgentsMdBlock, rewriteAgentsMd, distTemplateRoot } from "../lib/installer.js";
 import { log } from "../lib/logger.js";
 import { precondition, conflict as conflictErr } from "../lib/errors.js";
+import { harlessConfigPath, harlessFileAbs, harlessStoredPath, isStoredPathForRel } from "../lib/paths.js";
 import type { Flags } from "../cli.js";
+
+function findFileEntry(mc: { files?: Array<{ path: string; hash: string }> }, rel: string) {
+  const stored = harlessStoredPath(rel);
+  const entry = mc.files?.find(f => isStoredPathForRel(f.path, rel));
+  if (entry && entry.path !== stored) entry.path = stored;
+  return entry;
+}
 
 export async function updateCmd(flags: Flags) {
   const cwd = process.cwd();
-  const configPath = path.join(cwd, ".harness/config.json");
+  const configPath = harlessConfigPath(cwd);
   if (!fs.existsSync(configPath)) {
-    throw precondition("no .harness/config.json found — run `harless init` first");
+    throw precondition("no .agents/config.json found — run `harless init` first");
   }
 
   const config = parseConfig(fs.readFileSync(configPath, "utf8"));
@@ -27,13 +35,13 @@ export async function updateCmd(flags: Flags) {
     if (!mDef) continue;
 
     for (const rel of mDef.files) {
-      const dst = path.join(cwd, ".harness", rel);
+      const dst = harlessFileAbs(cwd, rel);
       const src = path.join(tplRoot, "modules", mod, rel);
       if (!fs.existsSync(src)) continue;
 
       const newContent = fs.readFileSync(src, "utf8");
       const newHash = sha256(newContent);
-      const entry = mc.files.find(f => f.path === `.harness/${rel}`);
+      const entry = findFileEntry(mc, rel);
       const oldHash = entry?.hash ?? "";
       const diskContent = fs.existsSync(dst) ? fs.readFileSync(dst, "utf8") : null;
       const diskHash = diskContent !== null ? sha256(diskContent) : null;
@@ -45,28 +53,29 @@ export async function updateCmd(flags: Flags) {
         newTemplateHash: newHash,
       });
 
+      const disp = harlessStoredPath(rel);
       switch (action) {
         case "keep":
-          summary.push({ file: `.harness/${rel}`, action: "keep" });
+          summary.push({ file: disp, action: "keep" });
           break;
         case "overwrite":
           fs.mkdirSync(path.dirname(dst), { recursive: true });
           fs.writeFileSync(dst, newContent);
           if (rel.endsWith(".sh")) fs.chmodSync(dst, 0o755);
           if (entry) entry.hash = newHash;
-          summary.push({ file: `.harness/${rel}`, action: "overwritten" });
+          summary.push({ file: disp, action: "overwritten" });
           break;
         case "recreate":
           fs.mkdirSync(path.dirname(dst), { recursive: true });
           fs.writeFileSync(dst, newContent);
           if (rel.endsWith(".sh")) fs.chmodSync(dst, 0o755);
           if (entry) entry.hash = newHash;
-          else mc.files.push({ path: `.harness/${rel}`, hash: newHash });
-          summary.push({ file: `.harness/${rel}`, action: "recreated" });
+          else mc.files!.push({ path: harlessStoredPath(rel), hash: newHash });
+          summary.push({ file: disp, action: "recreated" });
           break;
         case "conflict":
           conflicts++;
-          summary.push({ file: `.harness/${rel}`, action: "CONFLICT (user-modified + template changed)" });
+          summary.push({ file: disp, action: "CONFLICT (user-modified + template changed)" });
           break;
       }
     }

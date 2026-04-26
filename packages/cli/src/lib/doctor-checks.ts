@@ -1,13 +1,14 @@
 import fs from "node:fs";
 import path from "node:path";
 import { parseConfig } from "./config.js";
+import { harlessConfigPath, HARLESS_ROOT, mcpConfigPaths } from "./paths.js";
 
 export const CHECKS = [
   { bit: 0, id: "node-version", label: "Node.js >= 18" },
-  { bit: 1, id: "config-exists", label: ".harness/config.json present + parseable" },
+  { bit: 1, id: "config-exists", label: ".agents/config.json present + parseable" },
   { bit: 2, id: "agents-md-marker", label: "AGENTS.md contains harless marker block" },
-  { bit: 3, id: "scripts-executable", label: "all .harness/scripts/*.sh have +x" },
-  { bit: 4, id: "mcp-entry", label: ".mcp.json has chrome-devtools (if browser-debug enabled)" },
+  { bit: 3, id: "scripts-executable", label: "all .agents/scripts/*.sh have +x" },
+  { bit: 4, id: "mcp-entry", label: ".mcp.json + .cursor/mcp.json have chrome-devtools (if browser-debug enabled)" },
   { bit: 5, id: "module-files-intact", label: "every config-listed file exists on disk" },
 ] as const;
 
@@ -41,7 +42,7 @@ export function runChecks(cwd: string): CheckResult[] {
   });
 
   // config-exists
-  const cfgPath = path.join(cwd, ".harness/config.json");
+  const cfgPath = harlessConfigPath(cwd);
   let config: ReturnType<typeof parseConfig> | null = null;
   let cfgOk = false;
   try {
@@ -65,7 +66,7 @@ export function runChecks(cwd: string): CheckResult[] {
   });
 
   // scripts-executable
-  const scriptsDir = path.join(cwd, ".harness/scripts");
+  const scriptsDir = path.join(cwd, HARLESS_ROOT, "scripts");
   let scriptsOk = true;
   let scriptHint: string | undefined;
   if (fs.existsSync(scriptsDir)) {
@@ -74,7 +75,7 @@ export function runChecks(cwd: string): CheckResult[] {
         fs.accessSync(path.join(scriptsDir, f), fs.constants.X_OK);
       } catch {
         scriptsOk = false;
-        scriptHint = `chmod +x .harness/scripts/${f}`;
+        scriptHint = `chmod +x ${HARLESS_ROOT}/scripts/${f}`;
         break;
       }
     }
@@ -86,19 +87,26 @@ export function runChecks(cwd: string): CheckResult[] {
 
   // mcp-entry
   let mcpOk = true;
+  let mcpHint: string | undefined;
   if (config?.modules["browser-debug"]?.enabled) {
-    const mcpPath = path.join(cwd, ".mcp.json");
-    try {
-      const mcp = JSON.parse(fs.readFileSync(mcpPath, "utf8"));
-      mcpOk = "chrome-devtools" in (mcp.mcpServers ?? {});
-    } catch {
+    const missing: string[] = [];
+    for (const mcpPath of mcpConfigPaths(cwd)) {
+      try {
+        const mcp = JSON.parse(fs.readFileSync(mcpPath, "utf8"));
+        if (!("chrome-devtools" in (mcp.mcpServers ?? {}))) missing.push(path.relative(cwd, mcpPath));
+      } catch {
+        missing.push(path.relative(cwd, mcpPath));
+      }
+    }
+    if (missing.length) {
       mcpOk = false;
+      mcpHint = `re-run \`harless add browser-debug\` — missing chrome-devtools in: ${missing.join(", ")}`;
     }
   }
   results.push({
     id: "mcp-entry", label: CHECKS[4].label,
     ok: mcpOk,
-    hint: !mcpOk ? "re-run `harless add browser-debug`" : undefined,
+    hint: !mcpOk ? mcpHint : undefined,
   });
 
   // module-files-intact

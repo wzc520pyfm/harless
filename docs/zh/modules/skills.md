@@ -12,11 +12,11 @@
 
 ## 文件
 
-- `.harness/skills/brainstorming/SKILL.md`
-- `.harness/skills/tdd/SKILL.md`
-- `.harness/skills/systematic-debugging/SKILL.md`
-- `.harness/skills/verification-before-completion/SKILL.md`
-- `.harness/skills/receiving-review/SKILL.md`
+- `.agents/skills/brainstorming/SKILL.md`
+- `.agents/skills/tdd/SKILL.md`
+- `.agents/skills/systematic-debugging/SKILL.md`
+- `.agents/skills/verification-before-completion/SKILL.md`
+- `.agents/skills/receiving-review/SKILL.md`
 
 ## 用法
 

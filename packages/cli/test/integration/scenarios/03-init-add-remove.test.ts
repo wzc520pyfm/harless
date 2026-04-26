@@ -13,17 +13,17 @@ afterEach(() => { process.chdir(orig); rmSync(cwd, { recursive: true, force: tru
 describe("scenario 03: init → add → remove lifecycle", () => {
   it("full lifecycle: init with subset, add module, remove module", async () => {
     await run(["init", "--yes", "--modules=skills"]);
-    expect(existsSync(path.join(cwd, ".harness/skills/brainstorming/SKILL.md"))).toBe(true);
-    expect(existsSync(path.join(cwd, ".harness/orchestrate/SKILL.md"))).toBe(false);
+    expect(existsSync(path.join(cwd, ".agents/skills/brainstorming/SKILL.md"))).toBe(true);
+    expect(existsSync(path.join(cwd, ".agents/orchestrate/SKILL.md"))).toBe(false);
 
     await run(["add", "orchestrate"]);
-    expect(existsSync(path.join(cwd, ".harness/orchestrate/SKILL.md"))).toBe(true);
-    let cfg = JSON.parse(readFileSync(path.join(cwd, ".harness/config.json"), "utf8"));
+    expect(existsSync(path.join(cwd, ".agents/orchestrate/SKILL.md"))).toBe(true);
+    let cfg = JSON.parse(readFileSync(path.join(cwd, ".agents/config.json"), "utf8"));
     expect(cfg.modules.orchestrate.enabled).toBe(true);
 
     await run(["remove", "orchestrate"]);
-    expect(existsSync(path.join(cwd, ".harness/orchestrate/SKILL.md"))).toBe(false);
-    cfg = JSON.parse(readFileSync(path.join(cwd, ".harness/config.json"), "utf8"));
+    expect(existsSync(path.join(cwd, ".agents/orchestrate/SKILL.md"))).toBe(false);
+    cfg = JSON.parse(readFileSync(path.join(cwd, ".agents/config.json"), "utf8"));
     expect(cfg.modules.orchestrate.enabled).toBe(false);
 
     const md = readFileSync(path.join(cwd, "AGENTS.md"), "utf8");

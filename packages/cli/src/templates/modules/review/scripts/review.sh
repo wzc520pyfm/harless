@@ -8,10 +8,10 @@ set -euo pipefail
 REF="${1:-HEAD}"
 AGENT_CMD="${AGENT_CMD:-claude -p}"
 TS=$(date +%Y-%m-%dT%H-%M-%S)
-OUT_DIR=.harness/review; mkdir -p "$OUT_DIR"
+OUT_DIR=.agents/review; mkdir -p "$OUT_DIR"
 OUT="$OUT_DIR/$TS.md"
 DIFF=$(git diff "$REF")
 if [[ -z "$DIFF" ]]; then echo "no diff against $REF"; exit 0; fi
-CHECKLIST=$(cat .harness/review/SKILL.md)
+CHECKLIST=$(cat .agents/review/SKILL.md)
 { echo "$CHECKLIST"; echo; echo "=== DIFF ==="; echo "$DIFF"; } | $AGENT_CMD > "$OUT"
 echo "✓ wrote $OUT"

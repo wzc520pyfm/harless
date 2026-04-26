@@ -5,12 +5,12 @@
 #   AGENT_CMD="cursor-agent -p"
 #   AGENT_CMD="codex exec"
 # Usage:
-#   echo "<markdown synopsis>" | bash .harness/scripts/compact.sh
-#   bash .harness/scripts/compact.sh < summary.md
+#   echo "<markdown synopsis>" | bash .agents/scripts/compact.sh
+#   bash .agents/scripts/compact.sh < summary.md
 set -euo pipefail
 DATE=$(date +%Y-%m-%d); TS=$(date +%Y-%m-%dT%H:%M:%S%z)
-DIR=.harness/memory/sessions; mkdir -p "$DIR"
+DIR=.agents/memory/sessions; mkdir -p "$DIR"
 FILE="$DIR/$DATE.md"
 { echo; echo "## Session @ $TS"; echo; cat; echo; } >> "$FILE"
 echo "✓ appended to $FILE"
-echo "Reminder: update topic files in .harness/memory/topics/ for any reusable knowledge."
+echo "Reminder: update topic files in .agents/memory/topics/ for any reusable knowledge."

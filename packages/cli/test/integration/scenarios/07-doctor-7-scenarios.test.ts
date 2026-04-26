@@ -33,7 +33,7 @@ describe("scenario 07: doctor checks", () => {
 
   it("fails when a module file is missing", async () => {
     await run(["init", "--yes", "--modules=skills"]);
-    unlinkSync(path.join(cwd, ".harness/skills/brainstorming/SKILL.md"));
+    unlinkSync(path.join(cwd, ".agents/skills/brainstorming/SKILL.md"));
     process.exitCode = undefined;
     await run(["doctor"]);
     expect(process.exitCode).toBeGreaterThanOrEqual(10);
@@ -41,7 +41,7 @@ describe("scenario 07: doctor checks", () => {
 
   it("fails when script not executable", async () => {
     await run(["init", "--yes"]);
-    const scripts = path.join(cwd, ".harness/scripts");
+    const scripts = path.join(cwd, ".agents/scripts");
     if (existsSync(scripts)) {
       const { readdirSync } = require("node:fs");
       for (const f of readdirSync(scripts).filter((f: string) => f.endsWith(".sh"))) {

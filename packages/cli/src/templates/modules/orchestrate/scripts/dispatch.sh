@@ -8,7 +8,7 @@ set -euo pipefail
 TASKS="${1:?usage: dispatch.sh <tasks.json>}"
 AGENT_CMD="${AGENT_CMD:-claude -p}"
 TS=$(date +%Y-%m-%dT%H-%M-%S)
-LOG_DIR=.harness/orchestrate; mkdir -p "$LOG_DIR"
+LOG_DIR=.agents/orchestrate; mkdir -p "$LOG_DIR"
 
 PIDS=()
 IDS=()

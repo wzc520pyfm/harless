@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { mkdtempSync, rmSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdtempSync, rmSync, readFileSync, writeFileSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { run } from "../../../src/cli.js";
@@ -26,6 +26,10 @@ describe("scenario 08: .mcp.json merge with user servers", () => {
     expect(mcp.mcpServers["custom-tool"]).toEqual({ command: "my-tool" });
     expect(mcp.mcpServers["chrome-devtools"]).toBeDefined();
     expect(Object.keys(mcp.mcpServers)).toHaveLength(3);
+
+    expect(existsSync(path.join(cwd, ".cursor", "mcp.json"))).toBe(true);
+    const cur = JSON.parse(readFileSync(path.join(cwd, ".cursor", "mcp.json"), "utf8"));
+    expect(cur.mcpServers["chrome-devtools"]).toBeDefined();
   });
 
   it("does not overwrite user-customized chrome-devtools entry", async () => {
@@ -39,5 +43,7 @@ describe("scenario 08: .mcp.json merge with user servers", () => {
 
     const mcp = JSON.parse(readFileSync(path.join(cwd, ".mcp.json"), "utf8"));
     expect(mcp.mcpServers["chrome-devtools"].command).toBe("my-custom-cdp");
+    const cur = JSON.parse(readFileSync(path.join(cwd, ".cursor", "mcp.json"), "utf8"));
+    expect(cur.mcpServers["chrome-devtools"].command).toBe("my-custom-cdp");
   });
 });

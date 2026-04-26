@@ -6,7 +6,7 @@
 npx harless init
 ```
 
-This creates `.harness/` in your project root, merges a managed block into
+This creates `.agents/` in your project root, merges a managed block into
 `AGENTS.md`, and optionally writes `.mcp.json` for browser-debug.
 
 ## Non-interactive
@@ -55,11 +55,11 @@ failing checks.
 
 1. **AGENTS.md** at the project root tells any compliant agent which skill
    files to read and when.
-2. **SKILL.md** files under `.harness/` define procedures (brainstorming,
+2. **SKILL.md** files under `.agents/` define procedures (brainstorming,
    TDD, debugging, etc.) the agent follows.
-3. **Shell scripts** under `.harness/scripts/` provide executable helpers
+3. **Shell scripts** under `.agents/scripts/` provide executable helpers
    (ralph loop, memory compact, dispatch, review, simplify).
 4. **config.json** tracks installed modules, hashes, and detected stack.
 
-No daemons, no hooks, no global config writes. Delete `.harness/` and the
+No daemons, no hooks, no global config writes. Delete `.agents/` and the
 AGENTS.md block to fully uninstall.

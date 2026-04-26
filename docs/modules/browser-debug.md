@@ -4,7 +4,7 @@ Discipline for browser automation via `chrome-devtools-mcp`.
 
 ## Files
 
-- `.harness/browser-debug/SKILL.md`
+- `.agents/browser-debug/SKILL.md`
 
 ## MCP
 

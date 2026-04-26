@@ -29,7 +29,7 @@ export function removeRowsFromAgentsBlock(existing: string, moduleName: string):
   const endIdx = existing.indexOf(END);
   let block = existing.slice(beginIdx, endIdx);
   for (const t of targets) {
-    const re = new RegExp(`^.*\`\\.harness/${escapeRe(t)}[^\`]*\`.*\\n`, "gm");
+    const re = new RegExp(`^.*\`\\.agents/${escapeRe(t)}[^\`]*\`.*\\n`, "gm");
     block = block.replace(re, "");
   }
   return existing.slice(0, beginIdx) + block + existing.slice(endIdx);

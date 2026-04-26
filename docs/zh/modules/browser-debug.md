@@ -4,7 +4,7 @@
 
 ## 文件
 
-- `.harness/browser-debug/SKILL.md`
+- `.agents/browser-debug/SKILL.md`
 
 ## MCP
 

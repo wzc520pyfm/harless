@@ -9,7 +9,7 @@ when-not-to-use:
   - Tasks with sequential dependencies (do them in order)
   - Single task that's fast enough in one agent
 requires-scripts:
-  - .harness/scripts/dispatch.sh
+  - .agents/scripts/dispatch.sh
 ---
 
 # Parallel Subagent Dispatch
@@ -30,10 +30,10 @@ requires-scripts:
 
 2. **Run dispatch.**
    ```bash
-   bash .harness/scripts/dispatch.sh tasks.json
+   bash .agents/scripts/dispatch.sh tasks.json
    ```
 
-3. **Review logs.** Each task produces `.harness/orchestrate/<id>-<ts>.log`.
+3. **Review logs.** Each task produces `.agents/orchestrate/<id>-<ts>.log`.
    Read logs for any task that exited non-zero.
 
 4. **Aggregate.** After all tasks complete, review changes across

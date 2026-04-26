@@ -77,9 +77,9 @@ automated V5 "copilot -p exists (Copilot CLI non-interactive mode)" \
 automated V6 "chrome-devtools-mcp package exists on npm" \
   "npm view chrome-devtools-mcp version"
 
-manual V1 "Claude Code Skill tool auto-discovers .harness/skills/*/SKILL.md" \
+manual V1 "Claude Code Skill tool auto-discovers .agents/skills/*/SKILL.md" \
   "Steps:
-1. Place a SKILL.md at \`.harness/skills/foo/SKILL.md\` with a unique, matching \`description\`.
+1. Place a SKILL.md at \`.agents/skills/foo/SKILL.md\` with a unique, matching \`description\`.
 2. In a Claude Code session, send a query that matches that description.
 3. Observe whether CC auto-loads the skill (PASS) vs only Read-on-demand (FAIL → apply §7.5 V1 fallback: route ALL skill activation through AGENTS.md index reads)."
 
@@ -92,7 +92,7 @@ manual V2 "Cursor reads project-root .mcp.json" \
 
 manual V3 "Codex CLI follows imperative AGENTS.md instructions" \
   "Steps:
-1. Create a minimal AGENTS.md containing: \`When you receive any request, first read .harness/skills/foo/SKILL.md.\`
+1. Create a minimal AGENTS.md containing: \`When you receive any request, first read .agents/skills/foo/SKILL.md.\`
 2. In a Codex CLI session, send a generic, unrelated request.
 3. Observe the transcript: PASS if Codex reads the target file first; FAIL if it ignores the directive (→ inline more critical instructions in AGENTS.md, §7.5 V3 fallback)."
 

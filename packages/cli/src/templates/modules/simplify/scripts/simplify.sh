@@ -8,9 +8,9 @@ set -euo pipefail
 TARGET="${1:-.}"
 AGENT_CMD="${AGENT_CMD:-claude -p}"
 TS=$(date +%Y-%m-%dT%H-%M-%S)
-OUT_DIR=.harness/simplify; mkdir -p "$OUT_DIR"
+OUT_DIR=.agents/simplify; mkdir -p "$OUT_DIR"
 OUT="$OUT_DIR/$TS.md"
-CHECKLIST=$(cat .harness/simplify/SKILL.md)
+CHECKLIST=$(cat .agents/simplify/SKILL.md)
 FILES=$(find "$TARGET" -type f -name '*.ts' -o -name '*.tsx' -o -name '*.js' -o -name '*.jsx' | head -50)
 if [[ -z "$FILES" ]]; then echo "no source files found in $TARGET"; exit 0; fi
 {

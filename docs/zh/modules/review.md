@@ -4,15 +4,15 @@
 
 ## 文件
 
-- `.harness/review/SKILL.md`
-- `.harness/scripts/review.sh`
+- `.agents/review/SKILL.md`
+- `.agents/scripts/review.sh`
 
 ## 用法
 
 ```bash
-bash .harness/scripts/review.sh HEAD
+bash .agents/scripts/review.sh HEAD
 ```
 
-输出：`.harness/review/<timestamp>.md`
+输出：`.agents/review/<timestamp>.md`
 
 审查清单涵盖：正确性、测试、命名、复杂度、安全性、性能和遗留问题。

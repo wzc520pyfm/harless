@@ -19,15 +19,15 @@ afterEach(() => {
 describe("harless update", () => {
   it("keeps files when neither disk nor template changed", async () => {
     await run(["init", "--yes", "--modules=skills", "--agents=claude-code"]);
-    const before = readFileSync(path.join(cwd, ".harness/skills/brainstorming/SKILL.md"), "utf8");
+    const before = readFileSync(path.join(cwd, ".agents/skills/brainstorming/SKILL.md"), "utf8");
     await run(["update"]);
-    const after = readFileSync(path.join(cwd, ".harness/skills/brainstorming/SKILL.md"), "utf8");
+    const after = readFileSync(path.join(cwd, ".agents/skills/brainstorming/SKILL.md"), "utf8");
     expect(after).toBe(before);
   });
 
   it("recreates missing files", async () => {
     await run(["init", "--yes", "--modules=skills", "--agents=claude-code"]);
-    const p = path.join(cwd, ".harness/skills/brainstorming/SKILL.md");
+    const p = path.join(cwd, ".agents/skills/brainstorming/SKILL.md");
     unlinkSync(p);
     expect(existsSync(p)).toBe(false);
     await run(["update"]);
@@ -36,7 +36,7 @@ describe("harless update", () => {
 
   it("detects user-modified + template-unchanged as keep", async () => {
     await run(["init", "--yes", "--modules=skills", "--agents=claude-code"]);
-    const p = path.join(cwd, ".harness/skills/brainstorming/SKILL.md");
+    const p = path.join(cwd, ".agents/skills/brainstorming/SKILL.md");
     writeFileSync(p, "user changes\n");
     await run(["update"]);
     expect(readFileSync(p, "utf8")).toBe("user changes\n");

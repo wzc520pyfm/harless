@@ -11,7 +11,7 @@
 npx harless init --yes
 ```
 
-- [ ] `.harness/` created with all default modules
+- [ ] `.agents/` created with all default modules
 - [ ] `AGENTS.md` contains harless marker block
 - [ ] `doctor` exits 0
 
@@ -19,12 +19,12 @@ npx harless init --yes
 
 Send: "Help me plan adding dark mode to this app"
 
-- [ ] Agent reads `.harness/skills/brainstorming/SKILL.md` (check transcript)
+- [ ] Agent reads `.agents/skills/brainstorming/SKILL.md` (check transcript)
 
 ## Step 3: loop runs
 
 ```bash
-bash .harness/scripts/loop.sh .harness/loop/test-task
+bash .agents/scripts/loop.sh .agents/loop/test-task
 ```
 
 - [ ] Script executes (may fail on check.sh — that's OK for smoke)
@@ -32,7 +32,7 @@ bash .harness/scripts/loop.sh .harness/loop/test-task
 ## Step 4: review runs
 
 ```bash
-bash .harness/scripts/review.sh HEAD
+bash .agents/scripts/review.sh HEAD
 ```
 
 - [ ] Script completes or exits with "no diff"

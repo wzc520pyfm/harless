@@ -1,5 +1,5 @@
 import fs from "node:fs";
-import path from "node:path";
+import { harlessConfigPath } from "../lib/paths.js";
 import { parseConfig, stringifyConfig } from "../lib/config.js";
 import { installModule, loadManifest, loadAgentsMdBlock, rewriteAgentsMd, distTemplateRoot } from "../lib/installer.js";
 import { log } from "../lib/logger.js";
@@ -9,9 +9,9 @@ import type { Flags } from "../cli.js";
 export async function addCmd(moduleName: string | undefined, flags: Flags) {
   if (!moduleName) throw precondition("usage: harless add <module>");
   const cwd = process.cwd();
-  const configPath = path.join(cwd, ".harness/config.json");
+  const configPath = harlessConfigPath(cwd);
   if (!fs.existsSync(configPath)) {
-    throw precondition("no .harness/config.json found — run `harless init` first");
+    throw precondition("no .agents/config.json found — run `harless init` first");
   }
 
   const config = parseConfig(fs.readFileSync(configPath, "utf8"));

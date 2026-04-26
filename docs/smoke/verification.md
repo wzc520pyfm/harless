@@ -25,10 +25,10 @@ Result: ✗ FAIL
 
 Result: ✓ PASS
 
-## V1 — Claude Code Skill tool auto-discovers .harness/skills/*/SKILL.md (MANUAL)
+## V1 — Claude Code Skill tool auto-discovers .agents/skills/*/SKILL.md (MANUAL)
 
 Steps:
-1. Place a SKILL.md at `.harness/skills/foo/SKILL.md` with a unique, matching `description`.
+1. Place a SKILL.md at `.agents/skills/foo/SKILL.md` with a unique, matching `description`.
 2. In a Claude Code session, send a query that matches that description.
 3. Observe whether CC auto-loads the skill (PASS) vs only Read-on-demand (FAIL → apply §7.5 V1 fallback: route ALL skill activation through AGENTS.md index reads).
 
@@ -47,7 +47,7 @@ Result: ? UNKNOWN (manual step not yet performed)
 ## V3 — Codex CLI follows imperative AGENTS.md instructions (MANUAL)
 
 Steps:
-1. Create a minimal AGENTS.md containing: `When you receive any request, first read .harness/skills/foo/SKILL.md.`
+1. Create a minimal AGENTS.md containing: `When you receive any request, first read .agents/skills/foo/SKILL.md.`
 2. In a Codex CLI session, send a generic, unrelated request.
 3. Observe the transcript: PASS if Codex reads the target file first; FAIL if it ignores the directive (→ inline more critical instructions in AGENTS.md, §7.5 V3 fallback).
 

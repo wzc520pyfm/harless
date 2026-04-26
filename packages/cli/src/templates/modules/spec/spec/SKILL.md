@@ -16,7 +16,7 @@ when-not-to-use:
 
 1. **Create a change folder.**
    ```bash
-   cp -r .harness/specs/.template .harness/specs/$(date +%Y-%m-%d)-<topic>
+   cp -r .agents/specs/.template .agents/specs/$(date +%Y-%m-%d)-<topic>
    ```
 2. **Fill `spec.md`** — the "what." Define the problem, constraints,
    acceptance criteria, and non-goals. Keep it under 1 page.

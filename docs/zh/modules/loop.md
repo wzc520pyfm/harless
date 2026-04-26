@@ -4,17 +4,17 @@
 
 ## 文件
 
-- `.harness/loop/SKILL.md`
-- `.harness/loop/.template/goal.md`
-- `.harness/loop/.template/check.sh`
-- `.harness/scripts/loop.sh`
+- `.agents/loop/SKILL.md`
+- `.agents/loop/.template/goal.md`
+- `.agents/loop/.template/check.sh`
+- `.agents/scripts/loop.sh`
 
 ## 用法
 
 ```bash
-cp -r .harness/loop/.template .harness/loop/my-task
+cp -r .agents/loop/.template .agents/loop/my-task
 # 编辑 goal.md 和 check.sh
-bash .harness/scripts/loop.sh .harness/loop/my-task
+bash .agents/scripts/loop.sh .agents/loop/my-task
 ```
 
 环境变量：`AGENT_CMD`（默认 `claude -p`），`MAX_ITER`（默认 20）。

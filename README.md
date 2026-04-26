@@ -9,7 +9,7 @@ English | [简体中文](./README.zh-CN.md)
 ## What is it?
 
 harless is a **CLI-injected** harness: it writes Markdown skills and shell
-scripts into your repo under `.harness/`, appends a managed block to
+scripts into your repo under `.agents/`, appends a managed block to
 `AGENTS.md`, and exits. No daemons, no hooks, no global config writes —
 you own every file.
 

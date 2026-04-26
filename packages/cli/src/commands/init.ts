@@ -10,6 +10,9 @@ import {
 import { log } from "../lib/logger.js";
 import { prompts } from "../lib/prompts.js";
 import { precondition } from "../lib/errors.js";
+import {
+  harlessConfigPath, harlessFileAbs, harlessRootAbs, harlessStoredPath, HARLESS_ROOT, isStoredPathForRel,
+} from "../lib/paths.js";
 import type { Flags } from "../cli.js";
 
 const ALL_MODULES = ["skills", "spec", "loop", "memory", "browser-debug", "orchestrate", "review", "simplify"];
@@ -20,7 +23,7 @@ const COEXIST_FILES = ["CLAUDE.md", ".cursorrules", ".github/copilot-instruction
 
 export async function initCmd(flags: Flags) {
   const cwd = process.cwd();
-  const configPath = path.join(cwd, ".harness/config.json");
+  const configPath = harlessConfigPath(cwd);
 
   if (fs.existsSync(configPath)) {
     return repairInit(cwd, configPath, flags);
@@ -61,7 +64,7 @@ export async function initCmd(flags: Flags) {
 
   detectCoexistence(cwd);
   rewriteAgentsMd(cwd, loadAgentsMdBlock(tplRoot));
-  fs.mkdirSync(path.join(cwd, ".harness"), { recursive: true });
+  fs.mkdirSync(harlessRootAbs(cwd), { recursive: true });
   fs.writeFileSync(configPath, stringifyConfig(config));
 
   log.ok(`harless v${config.version} installed at ${cwd}`);
@@ -80,17 +83,22 @@ async function repairInit(cwd: string, configPath: string, _flags: Flags) {
     const mDef = manifest[mod];
     if (!mDef) continue;
     for (const rel of mDef.files) {
-      const dst = path.join(cwd, ".harness", rel);
+      const dst = harlessFileAbs(cwd, rel);
       if (!fs.existsSync(dst)) {
         const src = path.join(tplRoot, "modules", mod, rel);
         fs.mkdirSync(path.dirname(dst), { recursive: true });
         fs.copyFileSync(src, dst);
         if (rel.endsWith(".sh")) fs.chmodSync(dst, 0o755);
         const newHash = sha256(fs.readFileSync(dst, "utf8"));
-        const entry = mc.files.find(f => f.path === `.harness/${rel}`);
-        if (entry) entry.hash = newHash;
-        else mc.files.push({ path: `.harness/${rel}`, hash: newHash });
-        log.info(`repair: re-created .harness/${rel}`);
+        const stored = harlessStoredPath(rel);
+        const entry = mc.files.find(f => isStoredPathForRel(f.path, rel));
+        if (entry) {
+          entry.path = stored;
+          entry.hash = newHash;
+        } else {
+          mc.files.push({ path: stored, hash: newHash });
+        }
+        log.info(`repair: re-created ${stored}`);
         repaired++;
       }
     }
@@ -127,10 +135,10 @@ function printGitignoreSnippet() {
   log.info("Suggested .gitignore additions:");
   log.dim([
     "  # harless",
-    "  .harness/.trash/",
-    "  .harness/memory/sessions/",
-    "  .harness/orchestrate/",
-    "  .harness/review/",
-    "  .harness/simplify/",
+    `  ${HARLESS_ROOT}/.trash/`,
+    `  ${HARLESS_ROOT}/memory/sessions/`,
+    `  ${HARLESS_ROOT}/orchestrate/`,
+    `  ${HARLESS_ROOT}/review/`,
+    `  ${HARLESS_ROOT}/simplify/`,
   ].join("\n"));
 }

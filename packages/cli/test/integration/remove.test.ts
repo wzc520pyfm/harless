@@ -19,21 +19,21 @@ afterEach(() => {
 describe("harless remove", () => {
   it("removes a pristine module (files deleted)", async () => {
     await run(["init", "--yes", "--modules=skills,loop", "--agents=claude-code"]);
-    expect(existsSync(path.join(cwd, ".harness/loop/SKILL.md"))).toBe(true);
+    expect(existsSync(path.join(cwd, ".agents/loop/SKILL.md"))).toBe(true);
     await run(["remove", "loop"]);
-    expect(existsSync(path.join(cwd, ".harness/loop/SKILL.md"))).toBe(false);
-    const cfg = JSON.parse(readFileSync(path.join(cwd, ".harness/config.json"), "utf8"));
+    expect(existsSync(path.join(cwd, ".agents/loop/SKILL.md"))).toBe(false);
+    const cfg = JSON.parse(readFileSync(path.join(cwd, ".agents/config.json"), "utf8"));
     expect(cfg.modules.loop.enabled).toBe(false);
   });
 
   it("trashes modified files with --yes", async () => {
     await run(["init", "--yes", "--modules=skills,loop", "--agents=claude-code"]);
-    const skillPath = path.join(cwd, ".harness/loop/SKILL.md");
+    const skillPath = path.join(cwd, ".agents/loop/SKILL.md");
     writeFileSync(skillPath, "user modified content\n");
     await run(["remove", "loop", "--yes"]);
     expect(existsSync(skillPath)).toBe(false);
     const trashFiles = rmSync; // just check .trash exists
-    expect(existsSync(path.join(cwd, ".harness/.trash"))).toBe(true);
+    expect(existsSync(path.join(cwd, ".agents/.trash"))).toBe(true);
   });
 
   it("removes AGENTS.md rows for the module", async () => {

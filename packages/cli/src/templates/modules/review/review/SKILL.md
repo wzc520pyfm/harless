@@ -9,7 +9,7 @@ when-not-to-use:
   - Trivial one-line changes
   - Changes already reviewed by a human
 requires-scripts:
-  - .harness/scripts/review.sh
+  - .agents/scripts/review.sh
 ---
 
 # Independent Diff Review
@@ -19,9 +19,9 @@ requires-scripts:
 1. **Stage your changes.** Make sure `git diff` shows what you want reviewed.
 2. **Run the review script.**
    ```bash
-   bash .harness/scripts/review.sh HEAD
+   bash .agents/scripts/review.sh HEAD
    ```
-3. **Read the review.** Output is at `.harness/review/<ts>.md`.
+3. **Read the review.** Output is at `.agents/review/<ts>.md`.
 4. **Address findings.** Use the receiving-review skill for each point.
 
 ## Review checklist (used by the review script)

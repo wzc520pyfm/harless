@@ -15,10 +15,10 @@ describe("scenario 05: update conflict with --yes exits 2", () => {
   it("exits with code 2 when user-modified + template changed with --yes", async () => {
     await run(["init", "--yes", "--modules=skills"]);
 
-    const p = path.join(cwd, ".harness/skills/brainstorming/SKILL.md");
+    const p = path.join(cwd, ".agents/skills/brainstorming/SKILL.md");
     writeFileSync(p, "user customized content\n");
 
-    const cfgPath = path.join(cwd, ".harness/config.json");
+    const cfgPath = path.join(cwd, ".agents/config.json");
     const cfg = JSON.parse(readFileSync(cfgPath, "utf8"));
     const entry = cfg.modules.skills.files.find((f: any) => f.path.includes("brainstorming"));
     if (entry) entry.hash = sha256("fake-old-template-content");

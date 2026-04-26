@@ -9,7 +9,7 @@ when-not-to-use:
   - Creative or design work (use brainstorming skill)
   - Single-shot tasks with no iteration needed
 requires-scripts:
-  - .harness/scripts/loop.sh
+  - .agents/scripts/loop.sh
 ---
 
 # Self-Correcting Loop (Ralph)
@@ -18,7 +18,7 @@ requires-scripts:
 
 1. **Create a work directory.**
    ```bash
-   cp -r .harness/loop/.template .harness/loop/<task-name>
+   cp -r .agents/loop/.template .agents/loop/<task-name>
    ```
 2. **Write `goal.md`.** Describe what the agent should accomplish in
    each iteration. Be specific: include file paths, expected behavior,
@@ -27,7 +27,7 @@ requires-scripts:
    non-zero otherwise. Typical checks: `pnpm test`, `grep`, `diff`.
 4. **Run the loop.**
    ```bash
-   bash .harness/scripts/loop.sh .harness/loop/<task-name>
+   bash .agents/scripts/loop.sh .agents/loop/<task-name>
    ```
 5. **Review iteration logs.** Each iteration produces `iter-N.log`.
    If the loop hits `MAX_ITER` (default 20), read the last log and

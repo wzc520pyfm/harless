@@ -17,13 +17,13 @@ afterEach(() => {
 });
 
 describe("harless init (non-interactive)", () => {
-  it("creates .harness/, AGENTS.md, config.json", async () => {
+  it("creates .agents/, AGENTS.md, config.json", async () => {
     await run(["init", "--yes", "--modules=skills,spec", "--agents=claude-code"]);
     expect(existsSync(path.join(cwd, "AGENTS.md"))).toBe(true);
-    expect(existsSync(path.join(cwd, ".harness/config.json"))).toBe(true);
-    expect(existsSync(path.join(cwd, ".harness/skills/brainstorming/SKILL.md"))).toBe(true);
-    expect(existsSync(path.join(cwd, ".harness/spec/SKILL.md"))).toBe(true);
-    const cfg = JSON.parse(readFileSync(path.join(cwd, ".harness/config.json"), "utf8"));
+    expect(existsSync(path.join(cwd, ".agents/config.json"))).toBe(true);
+    expect(existsSync(path.join(cwd, ".agents/skills/brainstorming/SKILL.md"))).toBe(true);
+    expect(existsSync(path.join(cwd, ".agents/spec/SKILL.md"))).toBe(true);
+    const cfg = JSON.parse(readFileSync(path.join(cwd, ".agents/config.json"), "utf8"));
     expect(cfg.modules.skills.enabled).toBe(true);
     expect(cfg.modules.spec.enabled).toBe(true);
     expect(cfg.modules.loop).toBeUndefined();
@@ -52,7 +52,7 @@ describe("harless init (non-interactive)", () => {
 
   it("self-repair re-creates missing file", async () => {
     await run(["init", "--yes", "--modules=skills"]);
-    const skillPath = path.join(cwd, ".harness/skills/brainstorming/SKILL.md");
+    const skillPath = path.join(cwd, ".agents/skills/brainstorming/SKILL.md");
     expect(existsSync(skillPath)).toBe(true);
     rmSync(skillPath);
     expect(existsSync(skillPath)).toBe(false);

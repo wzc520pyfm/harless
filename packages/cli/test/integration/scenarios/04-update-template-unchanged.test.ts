@@ -13,7 +13,7 @@ afterEach(() => { process.chdir(orig); rmSync(cwd, { recursive: true, force: tru
 describe("scenario 04: update when template unchanged", () => {
   it("keeps all files untouched when no template change", async () => {
     await run(["init", "--yes", "--modules=skills"]);
-    const p = path.join(cwd, ".harness/skills/tdd/SKILL.md");
+    const p = path.join(cwd, ".agents/skills/tdd/SKILL.md");
     const before = readFileSync(p, "utf8");
     await run(["update"]);
     expect(readFileSync(p, "utf8")).toBe(before);
@@ -21,7 +21,7 @@ describe("scenario 04: update when template unchanged", () => {
 
   it("keeps user-modified files when template unchanged", async () => {
     await run(["init", "--yes", "--modules=skills"]);
-    const p = path.join(cwd, ".harness/skills/tdd/SKILL.md");
+    const p = path.join(cwd, ".agents/skills/tdd/SKILL.md");
     writeFileSync(p, "my custom TDD workflow\n");
     await run(["update"]);
     expect(readFileSync(p, "utf8")).toBe("my custom TDD workflow\n");

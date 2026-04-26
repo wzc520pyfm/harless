@@ -13,7 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 12 SKILL.md files (5 disciplines + 7 capability modules)
 - 5 shell scripts (loop.sh, compact.sh, review.sh, dispatch.sh, simplify.sh)
 - AGENTS.md managed block with marker-delimited merge
-- .mcp.json merge for chrome-devtools-mcp (browser-debug module)
+- MCP merge for `chrome-devtools-mcp` (browser-debug): writes **both** `.mcp.json` (Claude Code) and `.cursor/mcp.json` (Cursor) with the same merged `mcpServers` (first-seen server definitions win across files)
+
+### Changed
+
+- **BREAKING:** Injected files live under **`.agents/`** (not `.harness/`), with skills under **`.agents/skills/`** for Agent Skills–compatible discovery across Claude Code, Cursor, Codex CLI, and Gemini CLI. `config.json` paths and `AGENTS.md` links use `.agents/...`. Existing installs: re-run `harless init` or move `.harness/` → `.agents/` and update paths in `config.json` + `AGENTS.md`.
 - Hash-based file tracking for safe update/remove
 - Stack detection (Next.js, Vite, Remix, Astro, Svelte, React)
 - Package manager detection (pnpm, yarn, npm, bun)

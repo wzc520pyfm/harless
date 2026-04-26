@@ -5,14 +5,16 @@ import { sha256 } from "../lib/hash.js";
 import { removeRowsFromAgentsBlock } from "../lib/merge-agents-md.js";
 import { log } from "../lib/logger.js";
 import { precondition } from "../lib/errors.js";
+import { removeMcpServersFromAllProjectFiles } from "../lib/merge-mcp-json.js";
+import { harlessConfigPath, harlessRootAbs, harlessTrashRootAbs, HARLESS_ROOT } from "../lib/paths.js";
 import type { Flags } from "../cli.js";
 
 export async function removeCmd(moduleName: string | undefined, flags: Flags) {
   if (!moduleName) throw precondition("usage: harless remove <module>");
   const cwd = process.cwd();
-  const configPath = path.join(cwd, ".harness/config.json");
+  const configPath = harlessConfigPath(cwd);
   if (!fs.existsSync(configPath)) {
-    throw precondition("no .harness/config.json found — run `harless init` first");
+    throw precondition("no .agents/config.json found — run `harless init` first");
   }
 
   const config = parseConfig(fs.readFileSync(configPath, "utf8"));
@@ -37,10 +39,10 @@ export async function removeCmd(moduleName: string | undefined, flags: Flags) {
       fs.unlinkSync(abs);
       summary.push({ file: entry.path, action: "deleted" });
     } else if (flags.yes) {
-      const trashDst = path.join(cwd, ".harness/.trash", ts, path.relative(path.join(cwd, ".harness"), abs));
+      const trashDst = path.join(harlessTrashRootAbs(cwd), ts, path.relative(harlessRootAbs(cwd), abs));
       fs.mkdirSync(path.dirname(trashDst), { recursive: true });
       fs.renameSync(abs, trashDst);
-      summary.push({ file: entry.path, action: `trashed → .harness/.trash/${ts}/...` });
+      summary.push({ file: entry.path, action: `trashed → ${HARLESS_ROOT}/.trash/${ts}/...` });
     } else {
       log.warn(`${entry.path} was modified. Keeping (use --yes to trash).`);
       summary.push({ file: entry.path, action: "kept (modified)" });
@@ -48,16 +50,7 @@ export async function removeCmd(moduleName: string | undefined, flags: Flags) {
   }
 
   if (mc.mcp) {
-    const mcpPath = path.join(cwd, ".mcp.json");
-    if (fs.existsSync(mcpPath)) {
-      try {
-        const mcpJson = JSON.parse(fs.readFileSync(mcpPath, "utf8"));
-        for (const key of mc.mcp) {
-          delete mcpJson.mcpServers?.[key];
-        }
-        fs.writeFileSync(mcpPath, JSON.stringify(mcpJson, null, 2) + "\n");
-      } catch { /* leave corrupt .mcp.json alone */ }
-    }
+    removeMcpServersFromAllProjectFiles(cwd, mc.mcp);
   }
 
   const agentsMdPath = path.join(cwd, "AGENTS.md");

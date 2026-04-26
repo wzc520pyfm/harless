@@ -9,7 +9,7 @@
 ## 它是什么？
 
 harless 是一个 **CLI 注入式** harness：它将 Markdown skills 和 shell
-脚本写入你的仓库 `.harness/` 目录下，在 `AGENTS.md` 中追加一个受管理的区块，
+脚本写入你的仓库 `.agents/` 目录下，在 `AGENTS.md` 中追加一个受管理的区块，
 然后退出。无守护进程、无 hooks、无全局配置写入 —— 所有文件都由你完全掌控。
 
 ## 快速开始

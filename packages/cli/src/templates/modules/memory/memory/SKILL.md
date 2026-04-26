@@ -9,22 +9,22 @@ when-not-to-use:
   - Ephemeral debugging sessions
   - Information already in the codebase (comments, README)
 requires-scripts:
-  - .harness/scripts/compact.sh
+  - .agents/scripts/compact.sh
 ---
 
 # Cross-Session Memory
 
 ## Reading (session start)
 
-1. List topic files: `ls .harness/memory/topics/`
+1. List topic files: `ls .agents/memory/topics/`
 2. Read any topics matching the current task keywords.
-3. If no topics exist, check `ls .harness/memory/sessions/` for
+3. If no topics exist, check `ls .agents/memory/sessions/` for
    recent session logs.
 
 ## Writing topics
 
 Write topic files directly using your file-write tool:
-- Path: `.harness/memory/topics/<topic>.md` (e.g., `auth.md`, `deploy.md`)
+- Path: `.agents/memory/topics/<topic>.md` (e.g., `auth.md`, `deploy.md`)
 - Filename = retrieval key. Choose descriptive, grep-friendly names.
 - Keep each topic file focused: one concept per file.
 
@@ -38,7 +38,7 @@ Write topic files directly using your file-write tool:
    - Internal URLs not meant to be persisted
 3. Pipe the summary to the compact script:
    ```bash
-   echo "<your summary>" | bash .harness/scripts/compact.sh
+   echo "<your summary>" | bash .agents/scripts/compact.sh
    ```
 
 ## Log rotation

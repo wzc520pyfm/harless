@@ -14,8 +14,8 @@ describe("scenario 01: empty dir init", () => {
   it("creates full harness with all default modules", async () => {
     await run(["init", "--yes"]);
     expect(existsSync(path.join(cwd, "AGENTS.md"))).toBe(true);
-    expect(existsSync(path.join(cwd, ".harness/config.json"))).toBe(true);
-    const cfg = JSON.parse(readFileSync(path.join(cwd, ".harness/config.json"), "utf8"));
+    expect(existsSync(path.join(cwd, ".agents/config.json"))).toBe(true);
+    const cfg = JSON.parse(readFileSync(path.join(cwd, ".agents/config.json"), "utf8"));
     for (const m of ["skills", "spec", "loop", "memory", "browser-debug", "review"]) {
       expect(cfg.modules[m]?.enabled).toBe(true);
     }
@@ -34,7 +34,7 @@ describe("scenario 01: empty dir init", () => {
 
   it("all installed scripts are executable", async () => {
     await run(["init", "--yes"]);
-    const scriptsDir = path.join(cwd, ".harness/scripts");
+    const scriptsDir = path.join(cwd, ".agents/scripts");
     if (existsSync(scriptsDir)) {
       for (const f of readdirSync(scriptsDir).filter(f => f.endsWith(".sh"))) {
         const { mode } = require("node:fs").statSync(path.join(scriptsDir, f));

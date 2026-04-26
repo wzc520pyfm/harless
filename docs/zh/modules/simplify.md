@@ -4,16 +4,16 @@
 
 ## 文件
 
-- `.harness/simplify/SKILL.md`
-- `.harness/scripts/simplify.sh`
+- `.agents/simplify/SKILL.md`
+- `.agents/scripts/simplify.sh`
 
 ## 用法
 
 ```bash
-bash .harness/scripts/simplify.sh src/
+bash .agents/scripts/simplify.sh src/
 ```
 
-输出：`.harness/simplify/<timestamp>.md`
+输出：`.agents/simplify/<timestamp>.md`
 
 目标：死代码、过度抽象、冗余封装、过多间接层、复制粘贴重复、过早优化。
 

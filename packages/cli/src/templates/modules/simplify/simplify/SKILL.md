@@ -9,7 +9,7 @@ when-not-to-use:
   - Mid-implementation (finish first, simplify after)
   - Code you don't own or understand yet
 requires-scripts:
-  - .harness/scripts/simplify.sh
+  - .agents/scripts/simplify.sh
 ---
 
 # Code Simplification Scan
@@ -18,9 +18,9 @@ requires-scripts:
 
 1. **Run the simplify script** on target files or directories:
    ```bash
-   bash .harness/scripts/simplify.sh src/
+   bash .agents/scripts/simplify.sh src/
    ```
-2. **Read the report** at `.harness/simplify/<ts>.md`.
+2. **Read the report** at `.agents/simplify/<ts>.md`.
 3. **Evaluate each suggestion.** Not every simplification is correct —
    some complexity exists for good reasons.
 4. **Apply selectively.** Make one change at a time, run tests after each.
