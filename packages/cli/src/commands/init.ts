@@ -13,6 +13,7 @@ import { precondition } from "../lib/errors.js";
 import {
   harlessConfigPath, harlessFileAbs, harlessRootAbs, harlessStoredPath, HARLESS_ROOT, isStoredPathForRel,
 } from "../lib/paths.js";
+import { harlessCliVersion } from "../lib/cli-version.js";
 import type { Flags } from "../cli.js";
 
 const ALL_MODULES = ["skills", "spec", "loop", "memory", "browser-debug", "orchestrate", "review", "simplify"];
@@ -50,7 +51,7 @@ export async function initCmd(flags: Flags) {
   const tplRoot = distTemplateRoot();
   const manifest = loadManifest(tplRoot);
   const config: HarlessConfig = {
-    version: "0.1.0",
+    version: harlessCliVersion(),
     installedAt: new Date().toISOString(),
     stack: { detected: stack.framework, packageManager: stack.packageManager },
     agents,

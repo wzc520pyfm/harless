@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file. The
 format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] — 2026-04-26
+
+### Fixed
+
+- npm tarball: ship `README.md` (it was listed in `files` but missing from the package)
+- New installs: `.agents/config.json` `version` now matches the published CLI semver (read from `package.json`)
+
+### Changed
+
+- `package.json`: add `repository` (git URL + `directory: packages/cli`) for npm registry metadata
+
 ## [0.1.0] — 2026-04-26
 
 ### Added

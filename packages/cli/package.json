@@ -1,7 +1,12 @@
 {
   "name": "harless",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Minimal agent-agnostic AI Coding Harness kit",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nicepkg/harless.git",
+    "directory": "packages/cli"
+  },
   "license": "MIT",
   "type": "module",
   "bin": { "harless": "./dist/bin.js" },
