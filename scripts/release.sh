@@ -28,18 +28,42 @@ fi
 BRANCH="$(git branch --show-current)"
 [ -n "$BRANCH" ] || die "detached HEAD; checkout your release branch first"
 
-if git rev-parse "$TAG" >/dev/null 2>&1; then
-  if [ "$(git rev-parse "$TAG^{commit}")" != "$(git rev-parse HEAD)" ]; then
-    die "local tag $TAG exists but does not point at HEAD"
-  fi
-  echo "release: local tag $TAG already at HEAD"
-else
-  git tag -a "$TAG" -m "Release $TAG"
-  echo "release: created annotated tag $TAG"
+# Commit the tag should point at (annotated tag peel on remote, else lightweight ref).
+REMOTE_PEEL="$(git ls-remote origin "refs/tags/${TAG}^{}" 2>/dev/null | awk '{print $1; exit}')"
+if [ -z "$REMOTE_PEEL" ]; then
+  REMOTE_PEEL="$(git ls-remote origin "refs/tags/${TAG}" 2>/dev/null | awk -v r="refs/tags/$TAG" '$2==r{print $1; exit}')"
 fi
 
-if git ls-remote --tags origin "refs/tags/$TAG" | grep -q .; then
-  die "remote already has $TAG — bump packages/cli/package.json and CHANGELOG, then retry"
+HEAD_SHA="$(git rev-parse HEAD)"
+
+if [ -n "$REMOTE_PEEL" ]; then
+  if [ "$HEAD_SHA" != "$REMOTE_PEEL" ]; then
+    die "remote already has $TAG at $(git rev-parse --short "$REMOTE_PEEL" 2>/dev/null || echo "$REMOTE_PEEL"), but HEAD is $(git rev-parse --short HEAD). Bump packages/cli/package.json + CHANGELOG, or delete the remote tag only if it was never published."
+  fi
+  echo "release: $TAG already on origin at HEAD"
+  if git rev-parse "$TAG" >/dev/null 2>&1; then
+    if [ "$(git rev-parse "$TAG^{commit}")" != "$HEAD_SHA" ]; then
+      git tag -d "$TAG"
+      git tag -a "$TAG" -m "Release $TAG"
+      echo "release: realigned local $TAG to HEAD (matches origin)"
+    fi
+  else
+    git tag -a "$TAG" -m "Release $TAG"
+    echo "release: created local $TAG at HEAD (matches origin)"
+  fi
+else
+  if git rev-parse "$TAG" >/dev/null 2>&1; then
+    if [ "$(git rev-parse "$TAG^{commit}")" != "$HEAD_SHA" ]; then
+      git tag -d "$TAG"
+      echo "release: removed stale local $TAG (not on origin); will recreate at HEAD"
+    fi
+  fi
+  if ! git rev-parse "$TAG" >/dev/null 2>&1; then
+    git tag -a "$TAG" -m "Release $TAG"
+    echo "release: created annotated tag $TAG at HEAD"
+  else
+    echo "release: local tag $TAG already at HEAD"
+  fi
 fi
 
 pnpm install --frozen-lockfile
