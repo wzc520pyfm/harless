@@ -1,6 +1,6 @@
 {
   "name": "harless",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Minimal agent-agnostic AI Coding Harness kit",
   "repository": {
     "type": "git",

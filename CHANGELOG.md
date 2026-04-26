@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file. The
 format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.2] — 2026-04-26
+
+### Added
+
+- Root `pnpm release` script (`scripts/release.sh`): frozen install, build, test, annotated tag, push branch + tag
+
+### Changed
+
+- **Release CI:** tag workflow always runs verify + creates a **GitHub Release**; npm publish in Actions runs only when `NPM_TOKEN` is configured (local `pnpm -F harless publish` otherwise)
+
+### Fixed
+
+- `scripts/release.sh`: if semver tag exists locally on an old commit but the tag is **not** on `origin`, drop and recreate the tag at `HEAD` instead of failing; clearer error when `origin` already has the tag at a different commit; print `git status --short` when the tree is dirty
+
 ## [0.1.1] — 2026-04-26
 
 ### Fixed
