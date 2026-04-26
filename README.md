@@ -1,5 +1,7 @@
 # harless
 
+English | [简体中文](./README.zh-CN.md)
+
 > Minimal, agent-agnostic AI Coding Harness — one `npx harless init` to give
 > any repo a complete, lightweight harness for Claude Code, Cursor, Codex CLI,
 > and any AGENTS.md-aware agent.
