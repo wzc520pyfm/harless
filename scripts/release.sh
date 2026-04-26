@@ -15,6 +15,8 @@ command -v pnpm >/dev/null || die "pnpm not found"
 command -v git >/dev/null || die "git not found"
 
 if [ -n "$(git status --porcelain)" ]; then
+  echo "release: uncommitted or untracked files:" >&2
+  git status --short >&2
   die "working tree is not clean; commit or stash before releasing"
 fi
 
