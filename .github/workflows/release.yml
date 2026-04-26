@@ -22,3 +22,37 @@ jobs:
       - run: pnpm -F harless publish --provenance --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  github-release:
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Release notes from CHANGELOG
+        id: notes
+        env:
+          TAG_NAME: ${{ github.ref_name }}
+        run: |
+          VERSION="${TAG_NAME#v}"
+          NOTES="${RUNNER_TEMP}/release-notes.md"
+          awk -v ver="$VERSION" '
+            $0 ~ "^## \\[" ver "\\]" { flag = 1; next }
+            flag && $0 ~ /^## \[/ { exit }
+            flag { print }
+          ' CHANGELOG.md > "$NOTES" || true
+          if ! grep -q '[^[:space:]]' "$NOTES" 2>/dev/null; then
+            {
+              echo "## ${TAG_NAME}"
+              echo
+              echo "See [CHANGELOG.md](https://github.com/nicepkg/harless/blob/${TAG_NAME}/CHANGELOG.md) for details."
+            } > "$NOTES"
+          fi
+          echo "path=${NOTES}" >> "$GITHUB_OUTPUT"
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: harless ${{ github.ref_name }}
+          body_path: ${{ steps.notes.outputs.path }}
+          generate_release_notes: true

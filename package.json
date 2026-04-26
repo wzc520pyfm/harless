@@ -12,7 +12,8 @@
     "lint": "pnpm -r lint",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs"
+    "docs:preview": "vitepress preview docs",
+    "release": "bash scripts/release.sh"
   },
   "pnpm": {
     "onlyBuiltDependencies": ["esbuild"]
