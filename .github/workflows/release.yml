@@ -17,27 +17,7 @@ jobs:
       - run: pnpm -r build
       - run: pnpm -r test
 
-  # Optional: only when repository secret NPM_TOKEN is set (OIDC provenance).
-  publish-npm:
-    needs: verify
-    if: secrets.NPM_TOKEN != ''
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-          registry-url: https://registry.npmjs.org
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm -r build
-      - run: pnpm -F harless publish --provenance --access public --no-git-checks
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+  # npm publish runs locally via `pnpm release` (scripts/release.sh), not in CI.
 
   github-release:
     needs: verify

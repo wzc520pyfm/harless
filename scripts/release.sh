@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
-# One-shot: install → build → test → annotated tag v<semver> → push branch + tag.
+# One-shot: install → build → test → annotated tag v<semver> → push branch + tag → npm publish.
 # Prereqs: pnpm, git, clean working tree; packages/cli version already bumped and committed.
-# Post-push: .github/workflows/release.yml runs verify + creates a GitHub Release.
-# npm publish runs in CI only if secret NPM_TOKEN is set; otherwise publish locally, e.g.:
-#   pnpm -F harless publish --access public --no-git-checks
+# Post-push: .github/workflows/release.yml runs verify + creates a GitHub Release (npm is published here).
+# npm auth: `npm login` or export NPM_TOKEN for non-interactive publish.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -76,4 +75,7 @@ echo "release: pushing $BRANCH and $TAG to origin (triggers verify + GitHub Rele
 git push origin "$BRANCH"
 git push origin "refs/tags/$TAG"
 
-echo "release: done. Confirm the release workflow on GitHub Actions, then publish to npm locally if needed."
+echo "release: publishing harless@${VERSION} to npm…"
+pnpm -F harless publish --access public --no-git-checks
+
+echo "release: done. npm publish finished; GitHub Actions will still verify the tag and create the GitHub Release."
